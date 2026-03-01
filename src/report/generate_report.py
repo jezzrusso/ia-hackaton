@@ -12,6 +12,7 @@ if str(project_root) not in sys.path:
 from src.knowledge_base.catalog import lookup
 from src.stride.interaction_rules import threats_for_interaction
 from src.stride.rules import threats_for_component
+from src.stride.prioritization import prioritize_components
 
 
 def _bbox_center(bbox: List[float]) -> tuple[float, float]:
@@ -55,6 +56,17 @@ def infer_associations(components: List[Dict], max_neighbors: int = 2) -> List[D
 
 def build_threat_report(components_payload: Dict) -> Dict:
     components = components_payload.get("components", [])
+    selection_info = components_payload.get("selection")
+    excluded_components = components_payload.get("excluded_components", [])
+
+    if not selection_info:
+        components, excluded_components = prioritize_components(components)
+        selection_info = {
+            "strategy": "confidence_x_risk",
+            "max_components": 15,
+            "min_confidence": 0.0,
+        }
+
     report_components: List[Dict] = []
     associations = components_payload.get("associations") or infer_associations(components)
     component_by_id = {c.get("id"): c for c in components}
@@ -84,6 +96,8 @@ def build_threat_report(components_payload: Dict) -> Dict:
                 "type": comp_type,
                 "confidence": comp.get("confidence"),
                 "bbox": comp.get("bbox"),
+                "risk_score": comp.get("risk_score"),
+                "priority_score": comp.get("priority_score"),
                 "threats": comp_threats,
             }
         )
@@ -122,6 +136,8 @@ def build_threat_report(components_payload: Dict) -> Dict:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_image": components_payload.get("image"),
         "components_analyzed": len(report_components),
+        "components_excluded": len(excluded_components),
+        "selection": selection_info,
         "components": report_components,
         "associations_analyzed": len(interaction_threats),
         "associations": interaction_threats,
@@ -135,6 +151,8 @@ def to_markdown(report: Dict) -> str:
         f"- Gerado em: `{report['generated_at']}`",
         f"- Imagem de origem: `{report.get('source_image')}`",
         f"- Componentes analisados: **{report['components_analyzed']}**",
+        f"- Componentes excluídos por priorização: **{report.get('components_excluded', 0)}**",
+        f"- Estratégia de seleção: `{report.get('selection', {}).get('strategy', 'n/a')}`",
         f"- Associações analisadas: **{report.get('associations_analyzed', 0)}**",
         "",
     ]
@@ -149,6 +167,8 @@ def to_markdown(report: Dict) -> str:
     for comp in report["components"]:
         lines.append(f"## Componente {comp['id']} ({comp['type']})")
         lines.append(f"- Confiança: `{comp.get('confidence')}`")
+        lines.append(f"- Risco estimado: `{comp.get('risk_score')}`")
+        lines.append(f"- Prioridade (confiança x risco): `{comp.get('priority_score')}`")
         lines.append("")
 
         if not comp["threats"]:
