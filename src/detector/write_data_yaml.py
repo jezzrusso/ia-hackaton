@@ -1,10 +1,14 @@
 from pathlib import Path
+import sys
+
+project_root = Path(__file__).resolve().parents[2]
+if str(project_root) not in sys.path:
+    sys.path.append(str(project_root))
+
 from src.detector.classes import CLASSES
 
-def main():
-    # raiz do projeto = 2 níveis acima deste arquivo
-    project_root = Path(__file__).resolve().parents[2]
 
+def main():
     data_dir = project_root / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
 
@@ -24,6 +28,7 @@ def main():
     yaml_path.write_text("\n".join(yaml) + "\n", encoding="utf-8")
 
     print(f"OK: {yaml_path} atualizado")
+
 
 if __name__ == "__main__":
     main()
