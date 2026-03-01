@@ -1,48 +1,80 @@
-# Security Analysis Project
+# Modelagem de Ameaças com IA (MVP)
 
-A comprehensive security analysis system that combines threat modeling, detection algorithms, and knowledge bases to identify and mitigate security vulnerabilities.
+Este repositório implementa um MVP para o desafio de **modelagem automática de ameaças** a partir de diagramas de arquitetura, combinando:
 
-## Project Structure
+1. **Detecção supervisionada de componentes** (YOLO);
+2. **Mapeamento STRIDE por tipo de componente**;
+3. **Associação de vulnerabilidades e contramedidas**;
+4. **Geração de relatório automático** em JSON e Markdown.
 
-```
-├── docs/
-│   ├── planning.md
-│   ├── architectures/
-│   │   ├── azure.png
-│   │   └── aws.png
-│   └── threat-baseline.md
+## Estrutura real do projeto
+
+```text
+.
 ├── data/
-│   ├── raw/
-│   └── annotated/
-├── src/
-│   ├── detector/
-│   ├── stride/
-│   ├── knowledge_base/
-│   └── report/
-├── notebooks/
-├── README.md
+│   ├── images/
+│   ├── labels/
+│   └── data.yaml
+├── docs/
+│   ├── desafio.md
+│   ├── planning.md
+│   ├── threat-baseline.md
+│   └── architectures/
+├── output/
+│   ├── *_components.json
+│   └── *_threat_report.(json|md)
+└── src/
+    ├── detector/
+    │   ├── classes.py
+    │   ├── train_yolo.py
+    │   ├── predict_yolo.py
+    │   └── write_data_yaml.py
+    ├── stride/
+    │   └── rules.py
+    ├── knowledge_base/
+    │   └── catalog.py
+    └── report/
+        └── generate_report.py
 ```
 
-## Components
+## Como executar
 
-- **Detector**: Security threat detection algorithms
-- **STRIDE**: Threat modeling implementation
-- **Knowledge Base**: Vulnerability database and patterns
-- **Report**: Analysis and reporting tools
+### 1) Gerar `data/data.yaml`
 
-## Getting Started
+```bash
+python src/detector/write_data_yaml.py
+```
 
-1. Clone the repository
-2. Install dependencies
-3. Configure data sources
-4. Run analysis tools
+### 2) Treinar detector (opcional)
 
-## Documentation
+```bash
+python src/detector/train_yolo.py
+```
 
-- [Planning](docs/planning.md) - Project planning and requirements
-- [Threat Baseline](docs/threat-baseline.md) - Security threat framework
-- [Architectures](docs/architectures/) - System architecture diagrams
+### 3) Detectar componentes nos diagramas
 
-## License
+```bash
+python src/detector/predict_yolo.py --device cpu
+```
 
-MIT License
+Arquivos esperados:
+- `output/aws_components.json`
+- `output/azure_components.json`
+
+### 4) Gerar relatório STRIDE + contramedidas
+
+```bash
+python src/report/generate_report.py --input-dir output --out-dir output
+```
+
+Arquivos gerados:
+- `output/aws_components_threat_report.json`
+- `output/aws_components_threat_report.md`
+- `output/azure_components_threat_report.json`
+- `output/azure_components_threat_report.md`
+
+## Limitações do MVP
+
+- O mapeamento STRIDE é baseado em regras heurísticas por tipo de componente.
+- A base de conhecimento de vulnerabilidades/contramedidas é inicial e pode ser expandida.
+- A qualidade do relatório depende da qualidade da detecção dos componentes.
