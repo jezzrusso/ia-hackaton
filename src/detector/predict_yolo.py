@@ -25,6 +25,30 @@ CATEGORY_COLORS: Dict[str, Tuple[int, int, int]] = {
 }
 
 
+SUPPORTED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp", ".webp"}
+
+
+def discover_dataset_images(project_root: Path) -> List[Path]:
+    images_root = project_root / "data" / "images"
+    if not images_root.exists():
+        return []
+
+    files = [
+        p
+        for p in images_root.rglob("*")
+        if p.is_file() and p.suffix.lower() in SUPPORTED_IMAGE_EXTENSIONS
+    ]
+    return sorted(files)
+
+
+def build_output_stem(image_path: Path, images_root: Path) -> str:
+    try:
+        relative_path = image_path.relative_to(images_root)
+        return "_".join(relative_path.with_suffix("").parts)
+    except ValueError:
+        return image_path.stem
+
+
 def _read_best_map50(run_dir: Path) -> float:
     """Lê o melhor mAP50 de runs/<nome>/results.csv (se existir)."""
     results_csv = run_dir / "results.csv"
@@ -317,15 +341,15 @@ def main():
         print(f"OK: {out_file}")
         return
 
-    default_images = [
-        project_root / "data" / "images" / "train" / "aws.png",
-        project_root / "data" / "images" / "val" / "azure.png",
-    ]
+    images_root = project_root / "data" / "images"
+    dataset_images = discover_dataset_images(project_root)
+    if not dataset_images:
+        raise FileNotFoundError(f"Nenhuma imagem encontrada em {images_root}")
 
     generated_json_files = []
     generated_annotated_files = []
 
-    for image_path in default_images:
+    for image_path in dataset_images:
         result = predict_one(
             model,
             image_path,
@@ -335,11 +359,12 @@ def main():
             max_components=args.max_components,
             min_confidence=args.min_priority_confidence,
         )
-        annotated_out = out_dir / f"{image_path.stem}_annotated.png"
+        output_stem = build_output_stem(image_path, images_root)
+        annotated_out = out_dir / f"{output_stem}_annotated.png"
         annotate_image(image_path, result["components"], annotated_out)
         result["annotated_image"] = str(annotated_out)
 
-        out_file = out_dir / f"{image_path.stem}_components.json"
+        out_file = out_dir / f"{output_stem}_components.json"
         out_file.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
 
         generated_json_files.append(out_file.name)
@@ -350,8 +375,8 @@ def main():
             f"(descartados: {len(result.get('excluded_components', []))})"
         )
 
-    print(f"OK: output/{' e output/'.join(generated_json_files)} gerados")
-    print(f"OK: output/{' e output/'.join(generated_annotated_files)} gerados")
+    print(f"OK: {len(generated_json_files)} arquivos JSON de componentes gerados em output/")
+    print(f"OK: {len(generated_annotated_files)} imagens anotadas geradas em output/")
     print(f"weights usado: {weights}")
 
 
