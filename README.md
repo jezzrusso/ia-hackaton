@@ -45,6 +45,10 @@ Este repositório implementa um MVP para o desafio de **modelagem automática de
 python src/detector/write_data_yaml.py
 ```
 
+> Observação (Windows): o script escreve `path` absoluto no YAML para evitar o erro
+> `images not found` quando o Ultralytics tenta resolver caminhos relativos no
+> diretório interno de datasets.
+
 ### 2) Treinar detector (opcional)
 
 ```bash
