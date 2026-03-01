@@ -204,8 +204,16 @@ def process_file(in_file: Path, out_dir: Path) -> None:
     payload = json.loads(in_file.read_text(encoding="utf-8"))
     report = build_threat_report(payload)
 
-    json_out = out_dir / f"{in_file.stem}_threat_report.json"
-    md_out = out_dir / f"{in_file.stem}_threat_report.md"
+    source_image = payload.get("image") or payload.get("source_image")
+    base_name = in_file.stem
+    if source_image:
+        source_name = str(source_image).replace("\\", "/").rsplit("/", maxsplit=1)[-1]
+        source_stem = Path(source_name).stem
+        if source_stem:
+            base_name = f"{source_stem}_components"
+
+    json_out = out_dir / f"{base_name}_threat_report.json"
+    md_out = out_dir / f"{base_name}_threat_report.md"
 
     json_out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     md_out.write_text(to_markdown(report), encoding="utf-8")
