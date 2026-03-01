@@ -68,6 +68,13 @@ python src/detector/predict_yolo.py --device cpu
 Arquivos esperados:
 - `output/aws_components.json`
 - `output/azure_components.json`
+- `output/aws_annotated.png`
+- `output/azure_annotated.png`
+
+Os PNGs anotados preservam a resolução original e incluem:
+- bounding box do componente;
+- rótulo visual com ID (`c1`, `c2`, ...);
+- linha de ligação quando o rótulo é deslocado para evitar sobreposição.
 
 ### 4) Gerar relatório STRIDE + contramedidas
 
