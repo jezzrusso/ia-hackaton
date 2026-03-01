@@ -3,3 +3,4 @@ opencv-python
 jinja2
 pydantic
 pyyaml
+pillow
