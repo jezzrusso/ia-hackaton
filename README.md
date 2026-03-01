@@ -52,8 +52,11 @@ python src/detector/write_data_yaml.py
 ### 2) Treinar detector (opcional)
 
 ```bash
-python src/detector/train_yolo.py
+python src/detector/train_yolo.py --device 0
 ```
+
+O script de treino agora regenera o `data/data.yaml` e valida automaticamente se
+`train` e `val` existem antes de iniciar o treinamento.
 
 ### 3) Detectar componentes nos diagramas
 
