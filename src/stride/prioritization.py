@@ -26,8 +26,8 @@ def component_risk_score(component_type: str) -> float:
 def prioritize_components(
     components: List[Dict],
     *,
-    max_components: int = 10,
-    min_confidence: float = 0.2,
+    max_components: int = 15,
+    min_confidence: float = 0.0,
 ) -> Tuple[List[Dict], List[Dict]]:
     """Seleciona os principais componentes por confiança + risco esperado.
 
@@ -53,4 +53,19 @@ def prioritize_components(
 
     selected = scored[:max_components]
     dropped = scored[max_components:]
+
+    if not selected and components:
+        fallback = []
+        for comp in components:
+            confidence = float(comp.get("confidence") or 0.0)
+            risk_score = component_risk_score(comp.get("type", "unknown"))
+            fallback.append({
+                **comp,
+                "risk_score": round(risk_score, 3),
+                "priority_score": round(confidence * risk_score, 4),
+            })
+        fallback.sort(key=lambda c: c.get("confidence", 0), reverse=True)
+        selected = fallback[:max_components]
+        dropped = fallback[max_components:]
+
     return selected, dropped

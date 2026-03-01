@@ -63,8 +63,8 @@ def build_threat_report(components_payload: Dict) -> Dict:
         components, excluded_components = prioritize_components(components)
         selection_info = {
             "strategy": "confidence_x_risk",
-            "max_components": 10,
-            "min_confidence": 0.2,
+            "max_components": 15,
+            "min_confidence": 0.0,
         }
 
     report_components: List[Dict] = []

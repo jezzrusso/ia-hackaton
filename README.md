@@ -62,7 +62,7 @@ O script de treino agora regenera o `data/data.yaml` e valida automaticamente se
 ### 3) Detectar componentes nos diagramas
 
 ```bash
-python src/detector/predict_yolo.py --device cpu
+python src/detector/predict_yolo.py --device cpu --max-components 15 --min-priority-confidence 0.0
 ```
 
 Arquivos esperados:
@@ -72,7 +72,6 @@ Arquivos esperados:
 - `output/azure_annotated.png`
 
 Os PNGs anotados preservam a resolução original e incluem:
-
 - apenas componentes priorizados por `confiança x risco`;
 - bounding box do componente;
 - rótulo visual com ID (`c1`, `c2`, ...);
@@ -81,6 +80,8 @@ Os PNGs anotados preservam a resolução original e incluem:
 A saída JSON também registra:
 - `selection`: estratégia de priorização aplicada;
 - `excluded_components`: componentes descartados para reduzir ruído.
+
+Você pode ajustar a priorização no CLI com `--max-components` e `--min-priority-confidence`.
 
 ### 4) Gerar relatório STRIDE + contramedidas
 
