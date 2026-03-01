@@ -1,4 +1,4 @@
-path: C:/Users/office/Documents/estudo/IA/FIAP/projetos/git/Hackaton/data
+path: data
 train: images/train
 val: images/val
 
