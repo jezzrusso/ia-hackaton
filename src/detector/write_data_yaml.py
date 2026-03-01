@@ -14,8 +14,12 @@ def main():
 
     yaml_path = data_dir / "data.yaml"
 
+    # Use absolute dataset root to avoid Ultralytics resolving relative paths
+    # against its internal default datasets directory on some environments.
+    dataset_root = (project_root / "data").resolve().as_posix()
+
     yaml = [
-        "path: data",
+        f"path: {dataset_root}",
         "train: images/train",
         "val: images/val",
         "",
