@@ -10,12 +10,55 @@ if str(project_root) not in sys.path:
     sys.path.append(str(project_root))
 
 from src.knowledge_base.catalog import lookup
+from src.stride.interaction_rules import threats_for_interaction
 from src.stride.rules import threats_for_component
+
+
+def _bbox_center(bbox: List[float]) -> tuple[float, float]:
+    return ((bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2)
+
+
+def _squared_distance(a: tuple[float, float], b: tuple[float, float]) -> float:
+    return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+
+
+def infer_associations(components: List[Dict], max_neighbors: int = 2) -> List[Dict]:
+    """Infere associações entre componentes usando proximidade de bounding boxes.
+
+    Quando o detector não fornece arestas/fluxos explícitos, usamos um fallback
+    de vizinhança espacial para enriquecer a análise do relatório.
+    """
+    candidates = [c for c in components if isinstance(c.get("bbox"), list) and len(c["bbox"]) == 4]
+    if len(candidates) < 2:
+        return []
+
+    centers = {c["id"]: _bbox_center(c["bbox"]) for c in candidates}
+    by_id = {c["id"]: c for c in candidates}
+    links = set()
+
+    for src in candidates:
+        src_id = src["id"]
+        ordered_targets = sorted(
+            [c for c in candidates if c["id"] != src_id],
+            key=lambda dst: _squared_distance(centers[src_id], centers[dst["id"]]),
+        )
+
+        for dst in ordered_targets[:max_neighbors]:
+            src_type = by_id[src_id].get("type", "unknown")
+            dst_type = dst.get("type", "unknown")
+            if not threats_for_interaction(src_type, dst_type):
+                continue
+            links.add(tuple(sorted((src_id, dst["id"]))))
+
+    return [{"source": s, "target": t} for s, t in sorted(links)]
 
 
 def build_threat_report(components_payload: Dict) -> Dict:
     components = components_payload.get("components", [])
     report_components: List[Dict] = []
+    associations = components_payload.get("associations") or infer_associations(components)
+    component_by_id = {c.get("id"): c for c in components}
+    interaction_threats: List[Dict] = []
 
     for comp in components:
         comp_id = comp.get("id", "unknown")
@@ -45,11 +88,43 @@ def build_threat_report(components_payload: Dict) -> Dict:
             }
         )
 
+    for assoc in associations:
+        source_id = assoc.get("source")
+        target_id = assoc.get("target")
+        source = component_by_id.get(source_id, {})
+        target = component_by_id.get(target_id, {})
+        source_type = source.get("type", "unknown")
+        target_type = target.get("type", "unknown")
+
+        threats = [
+            {
+                "category": t.category,
+                "threat": t.title,
+                "description": t.description,
+            }
+            for t in threats_for_interaction(source_type, target_type)
+        ]
+
+        if not threats:
+            continue
+
+        interaction_threats.append(
+            {
+                "source": source_id,
+                "source_type": source_type,
+                "target": target_id,
+                "target_type": target_type,
+                "threats": threats,
+            }
+        )
+
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_image": components_payload.get("image"),
         "components_analyzed": len(report_components),
         "components": report_components,
+        "associations_analyzed": len(interaction_threats),
+        "associations": interaction_threats,
     }
 
 
@@ -60,6 +135,7 @@ def to_markdown(report: Dict) -> str:
         f"- Gerado em: `{report['generated_at']}`",
         f"- Imagem de origem: `{report.get('source_image')}`",
         f"- Componentes analisados: **{report['components_analyzed']}**",
+        f"- Associações analisadas: **{report.get('associations_analyzed', 0)}**",
         "",
     ]
 
@@ -88,6 +164,17 @@ def to_markdown(report: Dict) -> str:
             for cm in threat["countermeasures"]:
                 lines.append(f"  - {cm}")
             lines.append(f"- Referências: {', '.join(threat['references'])}")
+            lines.append("")
+
+    if report.get("associations"):
+        lines.append("## Ameaças por associação entre componentes")
+        lines.append("")
+        for assoc in report["associations"]:
+            lines.append(
+                f"### {assoc['source']} ({assoc['source_type']}) ↔ {assoc['target']} ({assoc['target_type']})"
+            )
+            for i, threat in enumerate(assoc["threats"], 1):
+                lines.append(f"- {i}. [{threat['category']}] {threat['threat']}: {threat['description']}")
             lines.append("")
 
     return "\n".join(lines)
