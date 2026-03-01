@@ -114,14 +114,15 @@ def main():
     parser.add_argument("--out-dir", type=str, default="output", help="Diretório de saída dos relatórios")
     args = parser.parse_args()
 
-    out_dir = Path(args.out_dir)
+    # Usa caminhos absolutos baseados no projeto
+    out_dir = project_root / args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if args.input:
-        process_file(Path(args.input), out_dir)
+        process_file(project_root / Path(args.input), out_dir)
         return
 
-    input_dir = Path(args.input_dir)
+    input_dir = project_root / args.input_dir
     files = sorted(input_dir.glob("*_components.json"))
     if not files:
         raise FileNotFoundError(f"Nenhum arquivo *_components.json em {input_dir}")

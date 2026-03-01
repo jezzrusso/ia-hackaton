@@ -1,7 +1,6 @@
-path: data
+path: C:/Users/office/Documents/estudo/IA/FIAP/projetos/git/Hackaton/data
 train: images/train
 val: images/val
-
 names:
   0: user
   1: edge_security
