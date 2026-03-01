@@ -1,6 +1,7 @@
 from pathlib import Path
 import argparse
 import sys
+import warnings
 
 project_root = Path(__file__).resolve().parents[2]
 if str(project_root) not in sys.path:
@@ -59,16 +60,23 @@ def main():
     from ultralytics import YOLO
 
     model = YOLO("yolov8n.pt")
-    model.train(
-        data=str(data_yaml.resolve()),
-        epochs=args.epochs,
-        imgsz=640,
-        batch=args.batch,
-        device=args.device,
-        project=str(project_root / "runs"),
-        name=args.name,
-        augment=True,
-    )
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Mean of empty slice", category=RuntimeWarning)
+        warnings.filterwarnings(
+            "ignore",
+            message="invalid value encountered in divide",
+            category=RuntimeWarning,
+        )
+        model.train(
+            data=str(data_yaml.resolve()),
+            epochs=args.epochs,
+            imgsz=640,
+            batch=args.batch,
+            device=args.device,
+            project=str(project_root / "runs"),
+            name=args.name,
+            augment=True,
+        )
 
 
 if __name__ == "__main__":
