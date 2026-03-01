@@ -4,7 +4,7 @@ Este repositório implementa um MVP para o desafio de **modelagem automática de
 
 1. **Detecção supervisionada de componentes** (YOLO);
 2. **Mapeamento STRIDE por tipo de componente**;
-3. **Associação de vulnerabilidades e contramedidas**;
+3. **Mapeamento STRIDE por componente e por associação entre componentes**;
 4. **Geração de relatório automático** em JSON e Markdown.
 
 ## Estrutura real do projeto
@@ -30,7 +30,8 @@ Este repositório implementa um MVP para o desafio de **modelagem automática de
     │   ├── predict_yolo.py
     │   └── write_data_yaml.py
     ├── stride/
-    │   └── rules.py
+    │   ├── rules.py
+    │   └── interaction_rules.py
     ├── knowledge_base/
     │   └── catalog.py
     └── report/
@@ -83,5 +84,6 @@ Arquivos gerados:
 ## Limitações do MVP
 
 - O mapeamento STRIDE é baseado em regras heurísticas por tipo de componente.
+- As associações entre componentes são inferidas por proximidade espacial quando o detector não informa fluxos explícitos.
 - A base de conhecimento de vulnerabilidades/contramedidas é inicial e pode ser expandida.
 - A qualidade do relatório depende da qualidade da detecção dos componentes.
