@@ -1,6 +1,7 @@
 import argparse
 import csv
 import json
+import warnings
 from pathlib import Path
 import sys
 from typing import Dict, List, Tuple
@@ -70,7 +71,14 @@ def predict_one(
     max_components: int,
     min_confidence: float,
 ) -> dict:
-    results = model.predict(source=str(image_path), conf=conf, iou=iou, device=device, verbose=False)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Mean of empty slice", category=RuntimeWarning)
+        warnings.filterwarnings(
+            "ignore",
+            message="invalid value encountered in divide",
+            category=RuntimeWarning,
+        )
+        results = model.predict(source=str(image_path), conf=conf, iou=iou, device=device, verbose=False)
     r0 = results[0]
 
     comps = []
