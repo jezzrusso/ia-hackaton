@@ -309,47 +309,41 @@ def main():
         print(f"OK: {out_file}")
         return
 
-    aws_img = project_root / "data" / "images" / "train" / "aws.png"
-    azure_img = project_root / "data" / "images" / "val" / "azure.png"
+    default_images = [
+        project_root / "data" / "images" / "train" / "aws.png",
+        project_root / "data" / "images" / "val" / "azure.png",
+    ]
 
-    aws_json = predict_one(
-        model,
-        aws_img,
-        conf=args.conf,
-        iou=args.iou,
-        device=args.device,
-        max_components=args.max_components,
-        min_confidence=args.min_priority_confidence,
-    )
-    aws_annotated = out_dir / f"{aws_img.stem}_annotated.png"
-    annotate_image(aws_img, aws_json["components"], aws_annotated)
-    aws_json["annotated_image"] = str(aws_annotated)
-    (out_dir / "aws_components.json").write_text(json.dumps(aws_json, ensure_ascii=False, indent=2), encoding="utf-8")
+    generated_json_files = []
+    generated_annotated_files = []
 
-    azure_json = predict_one(
-        model,
-        azure_img,
-        conf=args.conf,
-        iou=args.iou,
-        device=args.device,
-        max_components=args.max_components,
-        min_confidence=args.min_priority_confidence,
-    )
-    azure_annotated = out_dir / f"{azure_img.stem}_annotated.png"
-    annotate_image(azure_img, azure_json["components"], azure_annotated)
-    azure_json["annotated_image"] = str(azure_annotated)
-    (out_dir / "azure_components.json").write_text(json.dumps(azure_json, ensure_ascii=False, indent=2), encoding="utf-8")
+    for image_path in default_images:
+        result = predict_one(
+            model,
+            image_path,
+            conf=args.conf,
+            iou=args.iou,
+            device=args.device,
+            max_components=args.max_components,
+            min_confidence=args.min_priority_confidence,
+        )
+        annotated_out = out_dir / f"{image_path.stem}_annotated.png"
+        annotate_image(image_path, result["components"], annotated_out)
+        result["annotated_image"] = str(annotated_out)
 
-    print(
-        f"aws.png: {len(aws_json['components'])} componentes priorizados "
-        f"(descartados: {len(aws_json.get('excluded_components', []))})"
-    )
-    print(
-        f"azure.png: {len(azure_json['components'])} componentes priorizados "
-        f"(descartados: {len(azure_json.get('excluded_components', []))})"
-    )
-    print("OK: output/aws_components.json e output/azure_components.json gerados")
-    print("OK: output/aws_annotated.png e output/azure_annotated.png gerados")
+        out_file = out_dir / f"{image_path.stem}_components.json"
+        out_file.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        generated_json_files.append(out_file.name)
+        generated_annotated_files.append(annotated_out.name)
+
+        print(
+            f"{image_path.name}: {len(result['components'])} componentes priorizados "
+            f"(descartados: {len(result.get('excluded_components', []))})"
+        )
+
+    print(f"OK: output/{' e output/'.join(generated_json_files)} gerados")
+    print(f"OK: output/{' e output/'.join(generated_annotated_files)} gerados")
     print(f"weights usado: {weights}")
 
 
