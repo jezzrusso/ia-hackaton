@@ -1,0 +1,5 @@
+ultralytics==8.*
+opencv-python
+jinja2
+pydantic
+pyyaml

@@ -1,0 +1,6 @@
+user
+edge_security
+gateway
+compute
+data_store
+ops

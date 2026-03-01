@@ -1,0 +1,11 @@
+path: C:/Users/office/Documents/estudo/IA/FIAP/projetos/git/Hackaton/data
+train: images/train
+val: images/val
+
+names:
+  0: user
+  1: edge_security
+  2: gateway
+  3: compute
+  4: data_store
+  5: ops
