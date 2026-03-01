@@ -72,6 +72,7 @@ Arquivos esperados:
 - `output/azure_annotated.png`
 
 Os PNGs anotados preservam a resolução original e incluem:
+
 - apenas componentes priorizados por `confiança x risco`;
 - bounding box do componente;
 - rótulo visual com ID (`c1`, `c2`, ...);
