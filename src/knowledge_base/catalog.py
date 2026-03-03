@@ -41,6 +41,24 @@ KB: Dict[Tuple[str, str], KnowledgeItem] = {
         ),
         references=("CIS Benchmarks", "NIST 800-53 AC-6"),
     ),
+    ("compute", "Information Disclosure"): KnowledgeItem(
+        vulnerability="Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
+        countermeasures=(
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas.",
+        ),
+        references=("OWASP Secrets Management", "NIST SP 800-57"),
+    ),
+    ("compute", "Tampering"): KnowledgeItem(
+        vulnerability="Pipeline de build/deploy sem verificação de integridade e proveniência.",
+        countermeasures=(
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift.",
+        ),
+        references=("SLSA", "NIST SSDF"),
+    ),
     ("data_store", "Information Disclosure"): KnowledgeItem(
         vulnerability="Dados sem criptografia forte e políticas frágeis de acesso.",
         countermeasures=(
@@ -49,6 +67,15 @@ KB: Dict[Tuple[str, str], KnowledgeItem] = {
             "Aplicar mascaramento/tokenização para dados críticos.",
         ),
         references=("OWASP Top 10 A02", "ISO 27001 Annex A"),
+    ),
+    ("data_store", "Tampering"): KnowledgeItem(
+        vulnerability="Ausência de trilha de auditoria imutável e controles fracos de alteração de dados.",
+        countermeasures=(
+            "Habilitar trilha de auditoria com retenção e proteção contra alteração.",
+            "Aplicar controles de integridade transacional e validação de entradas no app.",
+            "Separar contas de leitura/escrita e exigir aprovação para mudanças estruturais.",
+        ),
+        references=("CIS Database Benchmarks", "NIST 800-53 AU"),
     ),
 }
 

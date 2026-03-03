@@ -1,5 +1,6 @@
 import argparse
 import json
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 import sys
@@ -54,6 +55,45 @@ def infer_associations(components: List[Dict], max_neighbors: int = 2) -> List[D
     return [{"source": s, "target": t} for s, t in sorted(links)]
 
 
+def _quality_summary(components: List[Dict], interaction_threats: List[Dict]) -> Dict:
+    confidences = [float(c.get("confidence") or 0.0) for c in components]
+    if confidences:
+        avg_conf = round(sum(confidences) / len(confidences), 4)
+        min_conf = round(min(confidences), 4)
+        max_conf = round(max(confidences), 4)
+    else:
+        avg_conf = min_conf = max_conf = 0.0
+
+    type_counter = Counter(c.get("type", "unknown") for c in components)
+    type_distribution = dict(type_counter)
+
+    low_confidence_ratio = 0.0
+    if confidences:
+        low_confidence_ratio = round(sum(1 for c in confidences if c < 0.1) / len(confidences), 4)
+
+    alerts: List[str] = []
+    if avg_conf < 0.1 and components:
+        alerts.append("Confianca media baixa nas deteccoes; revisar dataset, anotacoes e hiperparametros do detector.")
+    if len(type_distribution) <= 1 and components:
+        alerts.append("Baixa diversidade de tipos detectados; resultado pode estar enviesado para uma classe dominante.")
+    if not interaction_threats and len(components) > 1:
+        alerts.append("Nenhuma ameaca de interacao encontrada; considere fornecer fluxos explicitos entre componentes.")
+
+    return {
+        "components_total": len(components),
+        "confidence": {
+            "avg": avg_conf,
+            "min": min_conf,
+            "max": max_conf,
+            "low_confidence_ratio_lt_0_1": low_confidence_ratio,
+        },
+        "type_distribution": type_distribution,
+        "distinct_types": len(type_distribution),
+        "interaction_threats_total": len(interaction_threats),
+        "alerts": alerts,
+    }
+
+
 def build_threat_report(components_payload: Dict) -> Dict:
     components = components_payload.get("components", [])
     selection_info = components_payload.get("selection")
@@ -62,9 +102,10 @@ def build_threat_report(components_payload: Dict) -> Dict:
     if not selection_info:
         components, excluded_components = prioritize_components(components)
         selection_info = {
-            "strategy": "confidence_x_risk",
+            "strategy": "confidence_x_risk_with_type_diversity",
             "max_components": 15,
             "min_confidence": 0.0,
+            "min_per_type": 1,
         }
 
     report_components: List[Dict] = []
@@ -132,12 +173,15 @@ def build_threat_report(components_payload: Dict) -> Dict:
             }
         )
 
+    quality = _quality_summary(report_components, interaction_threats)
+
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_image": components_payload.get("image"),
         "components_analyzed": len(report_components),
         "components_excluded": len(excluded_components),
         "selection": selection_info,
+        "quality": quality,
         "components": report_components,
         "associations_analyzed": len(interaction_threats),
         "associations": interaction_threats,
@@ -145,6 +189,8 @@ def build_threat_report(components_payload: Dict) -> Dict:
 
 
 def to_markdown(report: Dict) -> str:
+    quality = report.get("quality", {})
+    confidence = quality.get("confidence", {})
     lines = [
         "# Relatório de Modelagem de Ameaças (STRIDE)",
         "",
@@ -155,7 +201,21 @@ def to_markdown(report: Dict) -> str:
         f"- Estratégia de seleção: `{report.get('selection', {}).get('strategy', 'n/a')}`",
         f"- Associações analisadas: **{report.get('associations_analyzed', 0)}**",
         "",
+        "## Indicadores de qualidade",
+        f"- Confianca média das detecções: **{confidence.get('avg', 0.0)}**",
+        f"- Faixa de confiança (min..max): `{confidence.get('min', 0.0)} .. {confidence.get('max', 0.0)}`",
+        f"- Proporção de baixa confiança (<0.1): `{confidence.get('low_confidence_ratio_lt_0_1', 0.0)}`",
+        f"- Tipos distintos detectados: **{quality.get('distinct_types', 0)}**",
+        f"- Distribuição por tipo: `{quality.get('type_distribution', {})}`",
+        "",
     ]
+
+    alerts = quality.get("alerts", [])
+    if alerts:
+        lines.append("## Alertas de confiabilidade")
+        for alert in alerts:
+            lines.append(f"- ⚠️ {alert}")
+        lines.append("")
 
     if not report["components"]:
         lines.extend([
@@ -229,7 +289,6 @@ def main():
     parser.add_argument("--out-dir", type=str, default="output", help="Diretório de saída dos relatórios")
     args = parser.parse_args()
 
-    # Usa caminhos absolutos baseados no projeto
     out_dir = project_root / args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -240,10 +299,11 @@ def main():
     input_dir = project_root / args.input_dir
     files = sorted(input_dir.glob("*_components.json"))
     if not files:
-        raise FileNotFoundError(f"Nenhum arquivo *_components.json em {input_dir}")
+        print(f"Nenhum arquivo *_components.json encontrado em: {input_dir}")
+        return
 
-    for file in files:
-        process_file(file, out_dir)
+    for f in files:
+        process_file(f, out_dir)
 
 
 if __name__ == "__main__":

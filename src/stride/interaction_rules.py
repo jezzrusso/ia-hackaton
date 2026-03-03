@@ -57,6 +57,25 @@ INTERACTION_STRIDE_RULES: Dict[Tuple[str, str], List[InteractionThreatTemplate]]
             "Mudanças operacionais sem trilha imutável dificultam atribuição e auditoria.",
         ),
     ],
+    ("compute", "compute"): [
+        InteractionThreatTemplate(
+            "Tampering",
+            "Movimentação lateral entre workloads",
+            "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços.",
+        ),
+        InteractionThreatTemplate(
+            "Denial of Service",
+            "Contenção de recursos entre serviços",
+            "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads.",
+        ),
+    ],
+    ("gateway", "gateway"): [
+        InteractionThreatTemplate(
+            "Denial of Service",
+            "Amplificação de tráfego entre camadas de entrada",
+            "Sem controle de cota e backpressure, gateways encadeados podem saturar mutuamente.",
+        ),
+    ],
 }
 
 
