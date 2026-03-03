@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-01T21:47:56.629822+00:00",
+  "generated_at": "2026-03-03T02:13:03.846971+00:00",
   "source_image": "C:\\Users\\office\\Documents\\estudo\\IA\\FIAP\\projetos\\git\\Hackaton\\data\\images\\train\\azure.png",
   "components_analyzed": 15,
   "components_excluded": 79,
@@ -7,6 +7,24 @@
     "strategy": "confidence_x_risk",
     "max_components": 15,
     "min_confidence": 0.0
+  },
+  "quality": {
+    "components_total": 15,
+    "confidence": {
+      "avg": 0.0038,
+      "min": 0.0022,
+      "max": 0.0068,
+      "low_confidence_ratio_lt_0_1": 1.0
+    },
+    "type_distribution": {
+      "compute": 15
+    },
+    "distinct_types": 1,
+    "interaction_threats_total": 18,
+    "alerts": [
+      "Confianca media baixa nas deteccoes; revisar dataset, anotacoes e hiperparametros do detector.",
+      "Baixa diversidade de tipos detectados; resultado pode estar enviesado para uma classe dominante."
+    ]
   },
   "components": [
     {
@@ -41,30 +59,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -101,30 +119,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -161,30 +179,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -221,30 +239,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -281,30 +299,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -341,30 +359,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -401,30 +419,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -461,30 +479,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -521,30 +539,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -581,30 +599,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -641,30 +659,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -701,30 +719,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -761,30 +779,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -821,30 +839,30 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
@@ -881,35 +899,360 @@
           "category": "Information Disclosure",
           "threat": "Vazamento de segredos em execução",
           "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Usar secret manager com rotação automática e acesso por identidade de workload.",
+            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
+            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "OWASP Secrets Management",
+            "NIST SP 800-57"
           ]
         },
         {
           "category": "Tampering",
           "threat": "Alteração não autorizada de artefatos",
           "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
           "countermeasures": [
-            "Definir baseline de segurança para o componente.",
-            "Ativar monitoramento e alertas com resposta a incidentes.",
-            "Executar testes contínuos de segurança (SAST/DAST/config)."
+            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
+            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
+            "Executar verificação de integridade e rollback automático em caso de drift."
           ],
           "references": [
-            "OWASP",
-            "NIST CSF"
+            "SLSA",
+            "NIST SSDF"
           ]
         }
       ]
     }
   ],
-  "associations_analyzed": 0,
-  "associations": []
+  "associations_analyzed": 18,
+  "associations": [
+    {
+      "source": "c1",
+      "source_type": "compute",
+      "target": "c13",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c1",
+      "source_type": "compute",
+      "target": "c87",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c12",
+      "source_type": "compute",
+      "target": "c20",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c12",
+      "source_type": "compute",
+      "target": "c23",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c12",
+      "source_type": "compute",
+      "target": "c3",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c12",
+      "source_type": "compute",
+      "target": "c4",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c13",
+      "source_type": "compute",
+      "target": "c87",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c14",
+      "source_type": "compute",
+      "target": "c19",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c14",
+      "source_type": "compute",
+      "target": "c7",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c14",
+      "source_type": "compute",
+      "target": "c8",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c19",
+      "source_type": "compute",
+      "target": "c7",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c2",
+      "source_type": "compute",
+      "target": "c49",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c2",
+      "source_type": "compute",
+      "target": "c5",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c2",
+      "source_type": "compute",
+      "target": "c7",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c20",
+      "source_type": "compute",
+      "target": "c4",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c23",
+      "source_type": "compute",
+      "target": "c3",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c49",
+      "source_type": "compute",
+      "target": "c5",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    },
+    {
+      "source": "c7",
+      "source_type": "compute",
+      "target": "c8",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Tampering",
+          "threat": "Movimentação lateral entre workloads",
+          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Contenção de recursos entre serviços",
+          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+        }
+      ]
+    }
+  ]
 }
