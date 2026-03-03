@@ -1,14 +1,915 @@
 {
-  "generated_at": "2026-03-01T20:55:34.175372+00:00",
-  "source_image": "C:\\Users\\office\\Documents\\estudo\\IA\\FIAP\\projetos\\git\\Hackaton\\data\\images\\val\\azure.png",
-  "components_analyzed": 0,
-  "components_excluded": 0,
+  "generated_at": "2026-03-01T21:47:56.629822+00:00",
+  "source_image": "C:\\Users\\office\\Documents\\estudo\\IA\\FIAP\\projetos\\git\\Hackaton\\data\\images\\train\\azure.png",
+  "components_analyzed": 15,
+  "components_excluded": 79,
   "selection": {
     "strategy": "confidence_x_risk",
-    "max_components": 10,
-    "min_confidence": 0.2
+    "max_components": 15,
+    "min_confidence": 0.0
   },
-  "components": [],
+  "components": [
+    {
+      "id": "c1",
+      "type": "compute",
+      "confidence": 0.0068,
+      "bbox": [
+        566.7456665039062,
+        70.13502502441406,
+        706.0,
+        179.2805938720703
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0544,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "type": "compute",
+      "confidence": 0.0065,
+      "bbox": [
+        173.80029296875,
+        255.46795654296875,
+        320.4383544921875,
+        389.3787536621094
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.052,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "type": "compute",
+      "confidence": 0.006,
+      "bbox": [
+        573.7329711914062,
+        272.7146911621094,
+        701.471435546875,
+        368.3305969238281
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.048,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "type": "compute",
+      "confidence": 0.0053,
+      "bbox": [
+        573.31982421875,
+        371.7838134765625,
+        702.2594604492188,
+        467.3933410644531
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0424,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "type": "compute",
+      "confidence": 0.0043,
+      "bbox": [
+        7.511369228363037,
+        289.2200012207031,
+        148.9792022705078,
+        392.8232421875
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0344,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c7",
+      "type": "compute",
+      "confidence": 0.0037,
+      "bbox": [
+        169.9345703125,
+        137.7008056640625,
+        320.3915100097656,
+        241.89987182617188
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0296,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c8",
+      "type": "compute",
+      "confidence": 0.0036,
+      "bbox": [
+        0.0,
+        8.121121406555176,
+        123.89419555664062,
+        122.16427612304688
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0288,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c12",
+      "type": "compute",
+      "confidence": 0.003,
+      "bbox": [
+        567.568359375,
+        293.1290588378906,
+        706.0,
+        465.129638671875
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.024,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c13",
+      "type": "compute",
+      "confidence": 0.0029,
+      "bbox": [
+        524.9218139648438,
+        70.97416687011719,
+        706.0,
+        239.5951690673828
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0232,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c14",
+      "type": "compute",
+      "confidence": 0.0029,
+      "bbox": [
+        147.8542938232422,
+        90.71650695800781,
+        458.1118469238281,
+        243.327392578125
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0232,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c19",
+      "type": "compute",
+      "confidence": 0.0027,
+      "bbox": [
+        319.6522216796875,
+        91.62190246582031,
+        517.7476806640625,
+        253.34652709960938
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0216,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c20",
+      "type": "compute",
+      "confidence": 0.0027,
+      "bbox": [
+        567.1212158203125,
+        434.8472900390625,
+        706.0,
+        557.23291015625
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0216,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c23",
+      "type": "compute",
+      "confidence": 0.0026,
+      "bbox": [
+        504.4532470703125,
+        61.36445617675781,
+        706.0,
+        479.3677673339844
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0208,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c49",
+      "type": "compute",
+      "confidence": 0.0024,
+      "bbox": [
+        8.792142868041992,
+        285.606689453125,
+        359.02105712890625,
+        420.6523742675781
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0192,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c87",
+      "type": "compute",
+      "confidence": 0.0022,
+      "bbox": [
+        531.3732299804688,
+        0.7607212662696838,
+        706.0,
+        178.82814025878906
+      ],
+      "risk_score": 8.0,
+      "priority_score": 0.0176,
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégio em workload",
+          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
+          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "countermeasures": [
+            "Aplicar princípio do menor privilégio em identidades de workload.",
+            "Segregar funções e contas por ambiente.",
+            "Monitorar e revisar grants de privilégio periodicamente."
+          ],
+          "references": [
+            "CIS Benchmarks",
+            "NIST 800-53 AC-6"
+          ]
+        },
+        {
+          "category": "Information Disclosure",
+          "threat": "Vazamento de segredos em execução",
+          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Tampering",
+          "threat": "Alteração não autorizada de artefatos",
+          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    }
+  ],
   "associations_analyzed": 0,
   "associations": []
 }
