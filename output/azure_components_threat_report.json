@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-03T02:13:03.846971+00:00",
+  "generated_at": "2026-03-03T02:18:28.893750+00:00",
   "source_image": "C:\\Users\\office\\Documents\\estudo\\IA\\FIAP\\projetos\\git\\Hackaton\\data\\images\\train\\azure.png",
   "components_analyzed": 15,
   "components_excluded": 79,
@@ -11,19 +11,23 @@
   "quality": {
     "components_total": 15,
     "confidence": {
-      "avg": 0.0038,
-      "min": 0.0022,
+      "avg": 0.0039,
+      "min": 0.0024,
       "max": 0.0068,
       "low_confidence_ratio_lt_0_1": 1.0
     },
     "type_distribution": {
-      "compute": 15
+      "compute": 10,
+      "data_store": 1,
+      "gateway": 1,
+      "user": 1,
+      "edge_security": 1,
+      "ops": 1
     },
-    "distinct_types": 1,
-    "interaction_threats_total": 18,
+    "distinct_types": 6,
+    "interaction_threats_total": 13,
     "alerts": [
-      "Confianca media baixa nas deteccoes; revisar dataset, anotacoes e hiperparametros do detector.",
-      "Baixa diversidade de tipos detectados; resultado pode estar enviesado para uma classe dominante."
+      "Confianca media baixa nas deteccoes; revisar dataset, anotacoes e hiperparametros do detector."
     ]
   },
   "components": [
@@ -628,307 +632,262 @@
       ]
     },
     {
-      "id": "c19",
-      "type": "compute",
-      "confidence": 0.0027,
+      "id": "c33",
+      "type": "data_store",
+      "confidence": 0.0025,
       "bbox": [
-        319.6522216796875,
-        91.62190246582031,
-        517.7476806640625,
-        253.34652709960938
+        151.94024658203125,
+        120.09590148925781,
+        329.9029235839844,
+        359.86932373046875
       ],
-      "risk_score": 8.0,
-      "priority_score": 0.0216,
+      "risk_score": 7.0,
+      "priority_score": 0.0175,
       "threats": [
         {
-          "category": "Elevation of Privilege",
-          "threat": "Escalada de privilégio em workload",
-          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
-          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
-          "countermeasures": [
-            "Aplicar princípio do menor privilégio em identidades de workload.",
-            "Segregar funções e contas por ambiente.",
-            "Monitorar e revisar grants de privilégio periodicamente."
-          ],
-          "references": [
-            "CIS Benchmarks",
-            "NIST 800-53 AC-6"
-          ]
-        },
-        {
           "category": "Information Disclosure",
-          "threat": "Vazamento de segredos em execução",
-          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
+          "threat": "Exposição de dados sensíveis",
+          "description": "Controles de acesso ou criptografia inadequados expõem dados em repouso.",
+          "vulnerability": "Dados sem criptografia forte e políticas frágeis de acesso.",
           "countermeasures": [
-            "Usar secret manager com rotação automática e acesso por identidade de workload.",
-            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
-            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
+            "Criptografar dados em repouso e em trânsito.",
+            "Restringir acesso por rede/identidade e auditar consultas sensíveis.",
+            "Aplicar mascaramento/tokenização para dados críticos."
           ],
           "references": [
-            "OWASP Secrets Management",
-            "NIST SP 800-57"
+            "OWASP Top 10 A02",
+            "ISO 27001 Annex A"
           ]
         },
         {
           "category": "Tampering",
-          "threat": "Alteração não autorizada de artefatos",
-          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
+          "threat": "Corrupção de dados",
+          "description": "Falta de validação e trilha de alterações permite alteração indevida de registros.",
+          "vulnerability": "Ausência de trilha de auditoria imutável e controles fracos de alteração de dados.",
           "countermeasures": [
-            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
-            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
-            "Executar verificação de integridade e rollback automático em caso de drift."
+            "Habilitar trilha de auditoria com retenção e proteção contra alteração.",
+            "Aplicar controles de integridade transacional e validação de entradas no app.",
+            "Separar contas de leitura/escrita e exigir aprovação para mudanças estruturais."
           ],
           "references": [
-            "SLSA",
-            "NIST SSDF"
+            "CIS Database Benchmarks",
+            "NIST 800-53 AU"
+          ]
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Indisponibilidade de banco",
+          "description": "Consultas pesadas/abusivas podem degradar severamente o datastore.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
           ]
         }
       ]
     },
     {
-      "id": "c20",
-      "type": "compute",
-      "confidence": 0.0027,
+      "id": "c18",
+      "type": "gateway",
+      "confidence": 0.0028,
       "bbox": [
-        567.1212158203125,
-        434.8472900390625,
-        706.0,
-        557.23291015625
+        159.64340209960938,
+        114.827880859375,
+        318.47381591796875,
+        240.81118774414062
       ],
-      "risk_score": 8.0,
-      "priority_score": 0.0216,
+      "risk_score": 6.0,
+      "priority_score": 0.0168,
       "threats": [
         {
-          "category": "Elevation of Privilege",
-          "threat": "Escalada de privilégio em workload",
-          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
-          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "category": "Spoofing",
+          "threat": "Falsificação de cliente no gateway",
+          "description": "Tokens/chaves expostas podem permitir chamadas não autorizadas à API.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
           "countermeasures": [
-            "Aplicar princípio do menor privilégio em identidades de workload.",
-            "Segregar funções e contas por ambiente.",
-            "Monitorar e revisar grants de privilégio periodicamente."
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
           ],
           "references": [
-            "CIS Benchmarks",
-            "NIST 800-53 AC-6"
-          ]
-        },
-        {
-          "category": "Information Disclosure",
-          "threat": "Vazamento de segredos em execução",
-          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
-          "countermeasures": [
-            "Usar secret manager com rotação automática e acesso por identidade de workload.",
-            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
-            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
-          ],
-          "references": [
-            "OWASP Secrets Management",
-            "NIST SP 800-57"
+            "OWASP",
+            "NIST CSF"
           ]
         },
         {
           "category": "Tampering",
-          "threat": "Alteração não autorizada de artefatos",
-          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
+          "threat": "Manipulação de payload em trânsito",
+          "description": "Falta de validação de input no gateway permite alteração maliciosa de dados.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
           "countermeasures": [
-            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
-            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
-            "Executar verificação de integridade e rollback automático em caso de drift."
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
           ],
           "references": [
-            "SLSA",
-            "NIST SSDF"
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Exaustão do gateway",
+          "description": "Sem rate limiting adequado, requisições massivas derrubam o serviço.",
+          "vulnerability": "Ausência de limitação de taxa e controles de burst na entrada.",
+          "countermeasures": [
+            "Configurar rate limit e quotas por cliente/chave.",
+            "Aplicar circuit breaker e timeout defensivo.",
+            "Habilitar proteção anti-DDoS do provedor cloud."
+          ],
+          "references": [
+            "OWASP API Security",
+            "NIST CSF PR.PT"
           ]
         }
       ]
     },
     {
-      "id": "c23",
-      "type": "compute",
+      "id": "c6",
+      "type": "user",
+      "confidence": 0.0039,
+      "bbox": [
+        7.184906005859375,
+        288.95343017578125,
+        149.84426879882812,
+        387.9482727050781
+      ],
+      "risk_score": 3.0,
+      "priority_score": 0.0117,
+      "threats": [
+        {
+          "category": "Spoofing",
+          "threat": "Impersonação de usuário",
+          "description": "Credenciais fracas ou sessão exposta podem permitir se passar por usuário legítimo.",
+          "vulnerability": "Autenticação fraca, ausência de MFA e reutilização de credenciais.",
+          "countermeasures": [
+            "Habilitar MFA para acessos críticos.",
+            "Aplicar política de senha forte e proteção contra brute force.",
+            "Adotar gerenciamento de sessão com expiração e rotação de token."
+          ],
+          "references": [
+            "OWASP ASVS V2",
+            "NIST SP 800-63"
+          ]
+        },
+        {
+          "category": "Repudiation",
+          "threat": "Negação de ações",
+          "description": "Sem trilha de auditoria confiável, o usuário pode negar operações realizadas.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c21",
+      "type": "edge_security",
       "confidence": 0.0026,
       "bbox": [
-        504.4532470703125,
-        61.36445617675781,
-        706.0,
-        479.3677673339844
+        0.0,
+        286.40399169921875,
+        340.17120361328125,
+        560.0
       ],
-      "risk_score": 8.0,
-      "priority_score": 0.0208,
+      "risk_score": 4.0,
+      "priority_score": 0.0104,
       "threats": [
         {
-          "category": "Elevation of Privilege",
-          "threat": "Escalada de privilégio em workload",
-          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
-          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
-          "countermeasures": [
-            "Aplicar princípio do menor privilégio em identidades de workload.",
-            "Segregar funções e contas por ambiente.",
-            "Monitorar e revisar grants de privilégio periodicamente."
-          ],
-          "references": [
-            "CIS Benchmarks",
-            "NIST 800-53 AC-6"
-          ]
-        },
-        {
-          "category": "Information Disclosure",
-          "threat": "Vazamento de segredos em execução",
-          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
-          "countermeasures": [
-            "Usar secret manager com rotação automática e acesso por identidade de workload.",
-            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
-            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
-          ],
-          "references": [
-            "OWASP Secrets Management",
-            "NIST SP 800-57"
-          ]
-        },
-        {
           "category": "Tampering",
-          "threat": "Alteração não autorizada de artefatos",
-          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
+          "threat": "Manipulação de regras de borda",
+          "description": "Mudanças indevidas em WAF/Firewall podem abrir caminho para ataques.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
           "countermeasures": [
-            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
-            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
-            "Executar verificação de integridade e rollback automático em caso de drift."
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
           ],
           "references": [
-            "SLSA",
-            "NIST SSDF"
+            "OWASP",
+            "NIST CSF"
+          ]
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Saturação de borda",
+          "description": "Ataques volumétricos podem degradar ou indisponibilizar proteção de entrada.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
+          "countermeasures": [
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
+          ],
+          "references": [
+            "OWASP",
+            "NIST CSF"
           ]
         }
       ]
     },
     {
-      "id": "c49",
-      "type": "compute",
+      "id": "c50",
+      "type": "ops",
       "confidence": 0.0024,
       "bbox": [
-        8.792142868041992,
-        285.606689453125,
-        359.02105712890625,
-        420.6523742675781
+        0.12949128448963165,
+        9.911999702453613,
+        161.84657287597656,
+        300.8660583496094
       ],
-      "risk_score": 8.0,
-      "priority_score": 0.0192,
+      "risk_score": 4.0,
+      "priority_score": 0.0096,
       "threats": [
         {
-          "category": "Elevation of Privilege",
-          "threat": "Escalada de privilégio em workload",
-          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
-          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "category": "Repudiation",
+          "threat": "Lacunas de auditoria operacional",
+          "description": "Sem logging centralizado e íntegro, ações administrativas ficam sem rastreio.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
           "countermeasures": [
-            "Aplicar princípio do menor privilégio em identidades de workload.",
-            "Segregar funções e contas por ambiente.",
-            "Monitorar e revisar grants de privilégio periodicamente."
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
           ],
           "references": [
-            "CIS Benchmarks",
-            "NIST 800-53 AC-6"
+            "OWASP",
+            "NIST CSF"
           ]
         },
-        {
-          "category": "Information Disclosure",
-          "threat": "Vazamento de segredos em execução",
-          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
-          "countermeasures": [
-            "Usar secret manager com rotação automática e acesso por identidade de workload.",
-            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
-            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
-          ],
-          "references": [
-            "OWASP Secrets Management",
-            "NIST SP 800-57"
-          ]
-        },
-        {
-          "category": "Tampering",
-          "threat": "Alteração não autorizada de artefatos",
-          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
-          "countermeasures": [
-            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
-            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
-            "Executar verificação de integridade e rollback automático em caso de drift."
-          ],
-          "references": [
-            "SLSA",
-            "NIST SSDF"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "c87",
-      "type": "compute",
-      "confidence": 0.0022,
-      "bbox": [
-        531.3732299804688,
-        0.7607212662696838,
-        706.0,
-        178.82814025878906
-      ],
-      "risk_score": 8.0,
-      "priority_score": 0.0176,
-      "threats": [
         {
           "category": "Elevation of Privilege",
-          "threat": "Escalada de privilégio em workload",
-          "description": "Configurações permissivas permitem que código acesse recursos além do necessário.",
-          "vulnerability": "Papéis IAM superpermissivos e execução com privilégios elevados.",
+          "threat": "Abuso de privilégios administrativos",
+          "description": "Papéis excessivos em operações podem levar a controle indevido do ambiente.",
+          "vulnerability": "Configuração insegura ou ausência de controles específicos para a ameaça.",
           "countermeasures": [
-            "Aplicar princípio do menor privilégio em identidades de workload.",
-            "Segregar funções e contas por ambiente.",
-            "Monitorar e revisar grants de privilégio periodicamente."
+            "Definir baseline de segurança para o componente.",
+            "Ativar monitoramento e alertas com resposta a incidentes.",
+            "Executar testes contínuos de segurança (SAST/DAST/config)."
           ],
           "references": [
-            "CIS Benchmarks",
-            "NIST 800-53 AC-6"
-          ]
-        },
-        {
-          "category": "Information Disclosure",
-          "threat": "Vazamento de segredos em execução",
-          "description": "Variáveis, logs ou artefatos podem expor credenciais e dados sensíveis.",
-          "vulnerability": "Exposição de segredos em variáveis de ambiente, logs e imagens de container.",
-          "countermeasures": [
-            "Usar secret manager com rotação automática e acesso por identidade de workload.",
-            "Sanitizar logs para remover dados sensíveis e bloquear debug em produção.",
-            "Assinar e escanear imagens para evitar artefatos com credenciais embutidas."
-          ],
-          "references": [
-            "OWASP Secrets Management",
-            "NIST SP 800-57"
-          ]
-        },
-        {
-          "category": "Tampering",
-          "threat": "Alteração não autorizada de artefatos",
-          "description": "Deploy sem integridade pode permitir execução de binário adulterado.",
-          "vulnerability": "Pipeline de build/deploy sem verificação de integridade e proveniência.",
-          "countermeasures": [
-            "Implementar assinatura de artefatos (ex.: Sigstore/cosign) e política de verificação em runtime.",
-            "Restringir permissão de escrita em repositórios e registries com aprovação obrigatória.",
-            "Executar verificação de integridade e rollback automático em caso de drift."
-          ],
-          "references": [
-            "SLSA",
-            "NIST SSDF"
+            "OWASP",
+            "NIST CSF"
           ]
         }
       ]
     }
   ],
-  "associations_analyzed": 18,
+  "associations_analyzed": 13,
   "associations": [
     {
       "source": "c1",
@@ -951,43 +910,7 @@
     {
       "source": "c1",
       "source_type": "compute",
-      "target": "c87",
-      "target_type": "compute",
-      "threats": [
-        {
-          "category": "Tampering",
-          "threat": "Movimentação lateral entre workloads",
-          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
-        },
-        {
-          "category": "Denial of Service",
-          "threat": "Contenção de recursos entre serviços",
-          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
-        }
-      ]
-    },
-    {
-      "source": "c12",
-      "source_type": "compute",
-      "target": "c20",
-      "target_type": "compute",
-      "threats": [
-        {
-          "category": "Tampering",
-          "threat": "Movimentação lateral entre workloads",
-          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
-        },
-        {
-          "category": "Denial of Service",
-          "threat": "Contenção de recursos entre serviços",
-          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
-        }
-      ]
-    },
-    {
-      "source": "c12",
-      "source_type": "compute",
-      "target": "c23",
+      "target": "c3",
       "target_type": "compute",
       "threats": [
         {
@@ -1041,7 +964,7 @@
     {
       "source": "c13",
       "source_type": "compute",
-      "target": "c87",
+      "target": "c3",
       "target_type": "compute",
       "threats": [
         {
@@ -1059,18 +982,18 @@
     {
       "source": "c14",
       "source_type": "compute",
-      "target": "c19",
-      "target_type": "compute",
+      "target": "c18",
+      "target_type": "gateway",
       "threats": [
         {
-          "category": "Tampering",
-          "threat": "Movimentação lateral entre workloads",
-          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégios via integração API-serviço",
+          "description": "Políticas permissivas entre gateway e serviço podem ampliar escopo de execução além do necessário."
         },
         {
           "category": "Denial of Service",
-          "threat": "Contenção de recursos entre serviços",
-          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+          "threat": "Saturação da camada de serviço por rajadas aceitas no gateway",
+          "description": "Sem proteção de cota ponta a ponta, picos de tráfego podem exaurir o backend."
         }
       ]
     },
@@ -1093,97 +1016,61 @@
       ]
     },
     {
-      "source": "c14",
-      "source_type": "compute",
+      "source": "c18",
+      "source_type": "gateway",
+      "target": "c7",
+      "target_type": "compute",
+      "threats": [
+        {
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégios via integração API-serviço",
+          "description": "Políticas permissivas entre gateway e serviço podem ampliar escopo de execução além do necessário."
+        },
+        {
+          "category": "Denial of Service",
+          "threat": "Saturação da camada de serviço por rajadas aceitas no gateway",
+          "description": "Sem proteção de cota ponta a ponta, picos de tráfego podem exaurir o backend."
+        }
+      ]
+    },
+    {
+      "source": "c18",
+      "source_type": "gateway",
       "target": "c8",
       "target_type": "compute",
       "threats": [
         {
-          "category": "Tampering",
-          "threat": "Movimentação lateral entre workloads",
-          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+          "category": "Elevation of Privilege",
+          "threat": "Escalada de privilégios via integração API-serviço",
+          "description": "Políticas permissivas entre gateway e serviço podem ampliar escopo de execução além do necessário."
         },
         {
           "category": "Denial of Service",
-          "threat": "Contenção de recursos entre serviços",
-          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
-        }
-      ]
-    },
-    {
-      "source": "c19",
-      "source_type": "compute",
-      "target": "c7",
-      "target_type": "compute",
-      "threats": [
-        {
-          "category": "Tampering",
-          "threat": "Movimentação lateral entre workloads",
-          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
-        },
-        {
-          "category": "Denial of Service",
-          "threat": "Contenção de recursos entre serviços",
-          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+          "threat": "Saturação da camada de serviço por rajadas aceitas no gateway",
+          "description": "Sem proteção de cota ponta a ponta, picos de tráfego podem exaurir o backend."
         }
       ]
     },
     {
       "source": "c2",
       "source_type": "compute",
-      "target": "c49",
-      "target_type": "compute",
+      "target": "c33",
+      "target_type": "data_store",
       "threats": [
         {
-          "category": "Tampering",
-          "threat": "Movimentação lateral entre workloads",
-          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+          "category": "Information Disclosure",
+          "threat": "Exposição de dados na comunicação aplicação-banco",
+          "description": "Conexões sem criptografia adequada ou com segredos fracos podem vazar dados sensíveis."
         },
         {
-          "category": "Denial of Service",
-          "threat": "Contenção de recursos entre serviços",
-          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+          "category": "Tampering",
+          "threat": "Manipulação de comandos de persistência",
+          "description": "Sem sanitização e autorização contextual, operações de escrita podem adulterar dados."
         }
       ]
     },
     {
-      "source": "c2",
-      "source_type": "compute",
-      "target": "c5",
-      "target_type": "compute",
-      "threats": [
-        {
-          "category": "Tampering",
-          "threat": "Movimentação lateral entre workloads",
-          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
-        },
-        {
-          "category": "Denial of Service",
-          "threat": "Contenção de recursos entre serviços",
-          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
-        }
-      ]
-    },
-    {
-      "source": "c2",
-      "source_type": "compute",
-      "target": "c7",
-      "target_type": "compute",
-      "threats": [
-        {
-          "category": "Tampering",
-          "threat": "Movimentação lateral entre workloads",
-          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
-        },
-        {
-          "category": "Denial of Service",
-          "threat": "Contenção de recursos entre serviços",
-          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
-        }
-      ]
-    },
-    {
-      "source": "c20",
+      "source": "c3",
       "source_type": "compute",
       "target": "c4",
       "target_type": "compute",
@@ -1201,56 +1088,33 @@
       ]
     },
     {
-      "source": "c23",
-      "source_type": "compute",
-      "target": "c3",
+      "source": "c33",
+      "source_type": "data_store",
+      "target": "c7",
       "target_type": "compute",
       "threats": [
         {
-          "category": "Tampering",
-          "threat": "Movimentação lateral entre workloads",
-          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
+          "category": "Information Disclosure",
+          "threat": "Exposição de dados na comunicação aplicação-banco",
+          "description": "Conexões sem criptografia adequada ou com segredos fracos podem vazar dados sensíveis."
         },
         {
-          "category": "Denial of Service",
-          "threat": "Contenção de recursos entre serviços",
-          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+          "category": "Tampering",
+          "threat": "Manipulação de comandos de persistência",
+          "description": "Sem sanitização e autorização contextual, operações de escrita podem adulterar dados."
         }
       ]
     },
     {
-      "source": "c49",
-      "source_type": "compute",
-      "target": "c5",
-      "target_type": "compute",
-      "threats": [
-        {
-          "category": "Tampering",
-          "threat": "Movimentação lateral entre workloads",
-          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
-        },
-        {
-          "category": "Denial of Service",
-          "threat": "Contenção de recursos entre serviços",
-          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
-        }
-      ]
-    },
-    {
-      "source": "c7",
-      "source_type": "compute",
+      "source": "c50",
+      "source_type": "ops",
       "target": "c8",
       "target_type": "compute",
       "threats": [
         {
-          "category": "Tampering",
-          "threat": "Movimentação lateral entre workloads",
-          "description": "Comunicação interna sem controles de segmentação permite alteração indevida entre serviços."
-        },
-        {
-          "category": "Denial of Service",
-          "threat": "Contenção de recursos entre serviços",
-          "description": "Ausência de isolamento de recursos pode causar indisponibilidade em cascata entre workloads."
+          "category": "Repudiation",
+          "threat": "Ações administrativas sem rastreabilidade",
+          "description": "Mudanças operacionais sem trilha imutável dificultam atribuição e auditoria."
         }
       ]
     }

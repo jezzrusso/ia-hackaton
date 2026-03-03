@@ -132,6 +132,73 @@
       "priority_score": 0.0232
     },
     {
+      "id": "c33",
+      "type": "data_store",
+      "bbox": [
+        151.94024658203125,
+        120.09590148925781,
+        329.9029235839844,
+        359.86932373046875
+      ],
+      "confidence": 0.0025,
+      "risk_score": 7.0,
+      "priority_score": 0.0175
+    },
+    {
+      "id": "c18",
+      "type": "gateway",
+      "bbox": [
+        159.64340209960938,
+        114.827880859375,
+        318.47381591796875,
+        240.81118774414062
+      ],
+      "confidence": 0.0028,
+      "risk_score": 6.0,
+      "priority_score": 0.0168
+    },
+    {
+      "id": "c6",
+      "type": "user",
+      "bbox": [
+        7.184906005859375,
+        288.95343017578125,
+        149.84426879882812,
+        387.9482727050781
+      ],
+      "confidence": 0.0039,
+      "risk_score": 3.0,
+      "priority_score": 0.0117
+    },
+    {
+      "id": "c21",
+      "type": "edge_security",
+      "bbox": [
+        0.0,
+        286.40399169921875,
+        340.17120361328125,
+        560.0
+      ],
+      "confidence": 0.0026,
+      "risk_score": 4.0,
+      "priority_score": 0.0104
+    },
+    {
+      "id": "c50",
+      "type": "ops",
+      "bbox": [
+        0.12949128448963165,
+        9.911999702453613,
+        161.84657287597656,
+        300.8660583496094
+      ],
+      "confidence": 0.0024,
+      "risk_score": 4.0,
+      "priority_score": 0.0096
+    }
+  ],
+  "excluded_components": [
+    {
       "id": "c19",
       "type": "compute",
       "bbox": [
@@ -195,9 +262,7 @@
       "confidence": 0.0022,
       "risk_score": 8.0,
       "priority_score": 0.0176
-    }
-  ],
-  "excluded_components": [
+    },
     {
       "id": "c88",
       "type": "compute",
@@ -210,19 +275,6 @@
       "confidence": 0.0022,
       "risk_score": 8.0,
       "priority_score": 0.0176
-    },
-    {
-      "id": "c33",
-      "type": "data_store",
-      "bbox": [
-        151.94024658203125,
-        120.09590148925781,
-        329.9029235839844,
-        359.86932373046875
-      ],
-      "confidence": 0.0025,
-      "risk_score": 7.0,
-      "priority_score": 0.0175
     },
     {
       "id": "c35",
@@ -262,19 +314,6 @@
       "confidence": 0.0025,
       "risk_score": 7.0,
       "priority_score": 0.0175
-    },
-    {
-      "id": "c18",
-      "type": "gateway",
-      "bbox": [
-        159.64340209960938,
-        114.827880859375,
-        318.47381591796875,
-        240.81118774414062
-      ],
-      "confidence": 0.0028,
-      "risk_score": 6.0,
-      "priority_score": 0.0168
     },
     {
       "id": "c44",
@@ -498,32 +537,6 @@
       "priority_score": 0.0138
     },
     {
-      "id": "c6",
-      "type": "user",
-      "bbox": [
-        7.184906005859375,
-        288.95343017578125,
-        149.84426879882812,
-        387.9482727050781
-      ],
-      "confidence": 0.0039,
-      "risk_score": 3.0,
-      "priority_score": 0.0117
-    },
-    {
-      "id": "c21",
-      "type": "edge_security",
-      "bbox": [
-        0.0,
-        286.40399169921875,
-        340.17120361328125,
-        560.0
-      ],
-      "confidence": 0.0026,
-      "risk_score": 4.0,
-      "priority_score": 0.0104
-    },
-    {
       "id": "c25",
       "type": "edge_security",
       "bbox": [
@@ -713,19 +726,6 @@
         430.3530578613281,
         573.5615234375,
         560.0
-      ],
-      "confidence": 0.0024,
-      "risk_score": 4.0,
-      "priority_score": 0.0096
-    },
-    {
-      "id": "c50",
-      "type": "ops",
-      "bbox": [
-        0.12949128448963165,
-        9.911999702453613,
-        161.84657287597656,
-        300.8660583496094
       ],
       "confidence": 0.0024,
       "risk_score": 4.0,
