@@ -1,6 +1,6 @@
 # Relatório de Modelagem de Ameaças (STRIDE)
 
-- Gerado em: `2026-03-03T02:18:28.896873+00:00`
+- Gerado em: `2026-03-03T02:33:30.893175+00:00`
 - Imagem de origem: `C:\Users\office\Documents\estudo\IA\FIAP\projetos\git\Hackaton\data\images\val\aws.png`
 - Componentes analisados: **15**
 - Componentes excluídos por priorização: **91**
