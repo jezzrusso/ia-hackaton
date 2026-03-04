@@ -1,0 +1,15 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# IDE
+.idea/
+
+# Dados locais (mantém estrutura se usar .gitkeep)
+data/**
+!data/**/
+!data/**/.gitkeep
+
+# Saídas/artefatos
+output/
+runs/
