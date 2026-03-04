@@ -3,9 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 import argparse
 import json
+import re
 import sys
 import xml.etree.ElementTree as ET
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 project_root = Path(__file__).resolve().parents[2]
 if str(project_root) not in sys.path:
@@ -21,12 +22,22 @@ DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
     "browser": "user",
     "admin": "user",
     "customer": "user",
+    "developer_portal": "user",
+    "sei_sip": "user",
     # edge_security
     "waf": "edge_security",
     "firewall": "edge_security",
     "security_group": "edge_security",
     "nsg": "edge_security",
     "cloudflare": "edge_security",
+    "identity_access_management": "edge_security",
+    "identity_and_access_management": "edge_security",
+    "identity_access_management_role": "edge_security",
+    "iam": "edge_security",
+    "key_vault": "edge_security",
+    "key_vaults": "edge_security",
+    "entra": "edge_security",
+    "microsoft_entra": "edge_security",
     # gateway
     "gateway": "gateway",
     "api_gateway": "gateway",
@@ -35,10 +46,21 @@ DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
     "ingress": "gateway",
     "load_balancer": "gateway",
     "lb": "gateway",
+    "cloudfront": "gateway",
+    "route_53": "gateway",
+    "vpc": "gateway",
+    "virtual_private_cloud": "gateway",
+    "virtual_network": "gateway",
+    "virtual_networks": "gateway",
+    "subnet": "gateway",
+    "public_subnet": "gateway",
+    "private_subnet": "gateway",
+    "region": "gateway",
     # compute
     "compute": "compute",
     "server": "compute",
     "vm": "compute",
+    "virtual_machine": "compute",
     "ec2": "compute",
     "lambda": "compute",
     "ecs": "compute",
@@ -47,6 +69,10 @@ DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
     "gke": "compute",
     "app_service": "compute",
     "container": "compute",
+    "cloud_run": "compute",
+    "openai": "compute",
+    "machine_learning": "compute",
+    "machine_learning_studio_workspaces": "compute",
     # data_store
     "data_store": "data_store",
     "database": "data_store",
@@ -54,12 +80,20 @@ DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
     "rds": "data_store",
     "aurora": "data_store",
     "dynamodb": "data_store",
+    "dynamodb_table": "data_store",
     "cosmosdb": "data_store",
+    "cosmos_db": "data_store",
     "sql": "data_store",
     "sql_database": "data_store",
     "redis": "data_store",
     "s3": "data_store",
     "storage": "data_store",
+    "redshift": "data_store",
+    "bigquery": "data_store",
+    "event_hubs": "data_store",
+    "pubsub": "data_store",
+    "solr": "data_store",
+    "elastic_file_system": "data_store",
     # ops
     "ops": "ops",
     "monitoring": "ops",
@@ -70,6 +104,15 @@ DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
     "devops": "ops",
     "cicd": "ops",
     "ci_cd": "ops",
+    "cloudformation": "ops",
+    "cloudformation_template": "ops",
+    "resource_groups": "ops",
+    "resource_group": "ops",
+    "backup": "ops",
+    "cloud_trail": "ops",
+    "auto_scaling": "ops",
+    "autoscaling": "ops",
+    "aws_cloud": "ops",
 }
 
 
@@ -77,13 +120,22 @@ PROVIDER_TOKENS = {"aws", "amazon", "azure", "gcp", "google", "cloud", "microsof
 
 
 KEYWORD_TO_GENERIC: Dict[str, str] = {
-    # gateway
+    # gateway/network
     "api_gateway": "gateway",
     "gateway": "gateway",
     "ingress": "gateway",
     "load_balancer": "gateway",
     "application_gateway": "gateway",
     "traffic_manager": "gateway",
+    "vpc": "gateway",
+    "virtual_private_cloud": "gateway",
+    "virtual_network": "gateway",
+    "subnet": "gateway",
+    "route_53": "gateway",
+    "route53": "gateway",
+    "cloudfront": "gateway",
+    "dns": "gateway",
+    "cdn": "gateway",
     # edge security
     "waf": "edge_security",
     "firewall": "edge_security",
@@ -91,6 +143,12 @@ KEYWORD_TO_GENERIC: Dict[str, str] = {
     "nsg": "edge_security",
     "shield": "edge_security",
     "ddos": "edge_security",
+    "identity": "edge_security",
+    "iam": "edge_security",
+    "access_management": "edge_security",
+    "vault": "edge_security",
+    "secret": "edge_security",
+    "entra": "edge_security",
     # data_store
     "sql": "data_store",
     "database": "data_store",
@@ -102,6 +160,15 @@ KEYWORD_TO_GENERIC: Dict[str, str] = {
     "kafka": "data_store",
     "redis": "data_store",
     "cache": "data_store",
+    "dynamodb": "data_store",
+    "cosmos": "data_store",
+    "bigquery": "data_store",
+    "redshift": "data_store",
+    "event_hub": "data_store",
+    "pubsub": "data_store",
+    "elasticsearch": "data_store",
+    "solr": "data_store",
+    "file_system": "data_store",
     # compute
     "compute": "compute",
     "server": "compute",
@@ -116,6 +183,10 @@ KEYWORD_TO_GENERIC: Dict[str, str] = {
     "synapse": "compute",
     "data_factory": "compute",
     "data_factories": "compute",
+    "machine_learning": "compute",
+    "cloud_run": "compute",
+    "openai": "compute",
+    "vm": "compute",
     # ops
     "monitor": "ops",
     "monitoring": "ops",
@@ -125,23 +196,35 @@ KEYWORD_TO_GENERIC: Dict[str, str] = {
     "prometheus": "ops",
     "grafana": "ops",
     "cloudwatch": "ops",
+    "cloudformation": "ops",
+    "resource_group": "ops",
+    "backup": "ops",
+    "auto_scaling": "ops",
+    "autoscaling": "ops",
     "log": "ops",
     "alert": "ops",
+    "trail": "ops",
     # user
     "user": "user",
     "client": "user",
     "consumer": "user",
     "admin": "user",
+    "developer": "user",
+    "portal": "user",
 }
 
-# Prioridade de decisão quando há múltiplas palavras candidatas no label
+# Prioridade determinística quando há múltiplas palavras candidatas no label
 GENERIC_PRIORITY = ["gateway", "edge_security", "data_store", "compute", "ops", "user"]
 
 
+class ConversionError(RuntimeError):
+    """Erro de conversão de um XML individual."""
+
+
 def _normalize_label(raw: str) -> str:
-    normalized = raw.strip().lower().replace(" ", "_").replace("-", "_")
-    while "__" in normalized:
-        normalized = normalized.replace("__", "_")
+    normalized = raw.strip().lower()
+    normalized = re.sub(r"[^a-z0-9]+", "_", normalized)
+    normalized = re.sub(r"_+", "_", normalized)
     return normalized.strip("_")
 
 
@@ -158,7 +241,7 @@ def _map_label(raw_label: str, mapping: Dict[str, str]) -> Optional[str]:
     if direct is not None:
         return direct
 
-    # 2) Tentativas com remoção de prefixos de provider
+    # 2) Tentativas com remoção de tokens de provider
     tokens = _tokenize(normalized)
     if not tokens:
         return None
@@ -168,9 +251,16 @@ def _map_label(raw_label: str, mapping: Dict[str, str]) -> Optional[str]:
     if direct is not None:
         return direct
 
-    # 3) Heurística por palavra-chave/substring
+    # 2.1) Singularização leve para reduzir variações no plural
+    singular_tokens = [tok[:-1] if tok.endswith("s") and len(tok) > 3 else tok for tok in tokens]
+    singular_collapsed = "_".join(singular_tokens)
+    direct = mapping.get(singular_collapsed)
+    if direct is not None:
+        return direct
+
+    # 3) Heurística por palavra-chave/substring com prioridade determinística
     hits: List[str] = []
-    search_space = [collapsed] + tokens
+    search_space = [collapsed, singular_collapsed] + tokens + singular_tokens
     for candidate, generic in KEYWORD_TO_GENERIC.items():
         for item in search_space:
             if candidate in item or item in candidate:
@@ -209,30 +299,45 @@ def _load_mapping(mapping_path: Optional[Path]) -> Dict[str, str]:
 
 
 def _find_xmls(xml_root: Path) -> List[Path]:
-    return sorted(xml_root.rglob("*.xml"))
+    return sorted([path for path in xml_root.rglob("*") if path.is_file() and path.suffix.lower() == ".xml"])
 
 
-def _first_text(node: ET.Element, tag: str) -> Optional[str]:
-    child = node.find(tag)
-    if child is None or child.text is None:
-        return None
-    return child.text.strip()
+def _local_name(tag: str) -> str:
+    if "}" in tag:
+        tag = tag.split("}", 1)[1]
+    return tag.lower()
+
+
+def _iter_elements_by_tag(root: ET.Element, tag: str) -> Iterable[ET.Element]:
+    wanted = tag.lower()
+    for node in root.iter():
+        if _local_name(node.tag) == wanted:
+            yield node
+
+
+def _first_text_anywhere(node: ET.Element, tag: str) -> Optional[str]:
+    for child in node.iter():
+        if _local_name(child.tag) == tag.lower() and child.text:
+            text = child.text.strip()
+            if text:
+                return text
+    return None
 
 
 def _parse_size(root: ET.Element) -> Tuple[int, int]:
-    size = root.find("size")
-    if size is None:
-        raise ValueError("XML sem nó <size>")
+    size_node = next(_iter_elements_by_tag(root, "size"), None)
+    if size_node is None:
+        raise ConversionError("XML sem nó <size>")
 
-    width_text = _first_text(size, "width")
-    height_text = _first_text(size, "height")
+    width_text = _first_text_anywhere(size_node, "width")
+    height_text = _first_text_anywhere(size_node, "height")
     if not width_text or not height_text:
-        raise ValueError("XML sem width/height em <size>")
+        raise ConversionError("XML sem width/height em <size>")
 
     width = int(float(width_text))
     height = int(float(height_text))
     if width <= 0 or height <= 0:
-        raise ValueError(f"Dimensão inválida: width={width}, height={height}")
+        raise ConversionError(f"Dimensão inválida: width={width}, height={height}")
     return width, height
 
 
@@ -254,35 +359,62 @@ def _safe_bbox(width: int, height: int, xmin: float, ymin: float, xmax: float, y
     return xmin, ymin, xmax, ymax
 
 
-def _convert_xml(xml_path: Path, xml_root: Path, mapping: Dict[str, str], labels_root: Path) -> Tuple[int, int, List[str]]:
+def _extract_bbox(obj: ET.Element) -> Optional[Tuple[float, float, float, float]]:
+    bndbox = next(_iter_elements_by_tag(obj, "bndbox"), None)
+    if bndbox is None:
+        return None
+
+    try:
+        xmin = float(_first_text_anywhere(bndbox, "xmin") or "")
+        ymin = float(_first_text_anywhere(bndbox, "ymin") or "")
+        xmax = float(_first_text_anywhere(bndbox, "xmax") or "")
+        ymax = float(_first_text_anywhere(bndbox, "ymax") or "")
+    except ValueError:
+        return None
+
+    return xmin, ymin, xmax, ymax
+
+
+def _convert_xml(
+    xml_path: Path,
+    xml_root: Path,
+    mapping: Dict[str, str],
+    labels_root: Path,
+    default_class: Optional[str],
+) -> Tuple[int, int, List[str], List[str]]:
     tree = ET.parse(xml_path)
     root = tree.getroot()
     width, height = _parse_size(root)
 
     yolo_lines: List[str] = []
     unknown_labels: List[str] = []
+    skip_reasons: List[str] = []
 
-    for obj in root.findall("object"):
-        raw_name = _first_text(obj, "name")
-        bndbox = obj.find("bndbox")
-        if not raw_name or bndbox is None:
+    objects = list(_iter_elements_by_tag(root, "object"))
+    total_objects = len(objects)
+
+    for idx, obj in enumerate(objects, start=1):
+        raw_name = _first_text_anywhere(obj, "name")
+        if not raw_name:
+            skip_reasons.append(f"obj#{idx}: sem <name>")
             continue
 
         mapped_label = _map_label(raw_name, mapping)
+        if mapped_label is None and default_class is not None:
+            mapped_label = default_class
         if mapped_label is None:
             unknown_labels.append(raw_name)
+            skip_reasons.append(f"obj#{idx} '{raw_name}': sem mapeamento")
             continue
 
-        try:
-            xmin = float(_first_text(bndbox, "xmin") or "")
-            ymin = float(_first_text(bndbox, "ymin") or "")
-            xmax = float(_first_text(bndbox, "xmax") or "")
-            ymax = float(_first_text(bndbox, "ymax") or "")
-        except ValueError:
+        bbox_raw = _extract_bbox(obj)
+        if bbox_raw is None:
+            skip_reasons.append(f"obj#{idx} '{raw_name}': bndbox ausente/inválido")
             continue
 
-        bbox = _safe_bbox(width, height, xmin, ymin, xmax, ymax)
+        bbox = _safe_bbox(width, height, *bbox_raw)
         if bbox is None:
+            skip_reasons.append(f"obj#{idx} '{raw_name}': bndbox degenerado")
             continue
 
         class_id = CLASS_TO_ID[mapped_label]
@@ -295,18 +427,10 @@ def _convert_xml(xml_path: Path, xml_root: Path, mapping: Dict[str, str], labels
     out_file = out_dir / out_name
     out_file.write_text("\n".join(yolo_lines) + ("\n" if yolo_lines else ""), encoding="utf-8")
 
-    return len(yolo_lines), len(root.findall("object")), unknown_labels
+    return len(yolo_lines), total_objects, unknown_labels, skip_reasons
 
 
 def _scan_labels(xml_files: List[Path], mapping: Dict[str, str]) -> Tuple[Dict[str, int], Dict[str, int], Dict[str, int], int]:
-    """Retorna frequência de rótulos em XML e sua situação no mapeamento.
-
-    Returns:
-        - all_labels: frequência por nome bruto do XML
-        - mapped_labels: frequência por classe genérica mapeada
-        - unmapped_labels: frequência por nome bruto sem mapeamento
-        - total_objects: total de objetos analisados
-    """
     all_labels: Dict[str, int] = {}
     mapped_labels: Dict[str, int] = {}
     unmapped_labels: Dict[str, int] = {}
@@ -314,8 +438,8 @@ def _scan_labels(xml_files: List[Path], mapping: Dict[str, str]) -> Tuple[Dict[s
 
     for xml_path in xml_files:
         root = ET.parse(xml_path).getroot()
-        for obj in root.findall("object"):
-            raw_name = _first_text(obj, "name")
+        for obj in _iter_elements_by_tag(root, "object"):
+            raw_name = _first_text_anywhere(obj, "name")
             if not raw_name:
                 continue
 
@@ -374,7 +498,24 @@ def main() -> None:
         action="store_true",
         help="Somente analisa rótulos existentes nos XMLs e cobertura do mapeamento, sem gerar TXT",
     )
+    parser.add_argument(
+        "--default-class",
+        type=str,
+        default=None,
+        help="Classe fallback para rótulos sem mapeamento (user, edge_security, gateway, compute, data_store, ops)",
+    )
+    parser.add_argument(
+        "--fail-on-empty",
+        action="store_true",
+        help="Falha com exit code 2 se algum XML com objetos gerar 0 linhas YOLO.",
+    )
     args = parser.parse_args()
+
+    if args.default_class is not None:
+        args.default_class = _normalize_label(args.default_class)
+        if args.default_class not in CLASS_TO_ID:
+            allowed = ", ".join(CLASSES)
+            raise ValueError(f"Classe default inválida '{args.default_class}'. Classes permitidas: {allowed}")
 
     if not args.xml_dir.exists():
         raise FileNotFoundError(f"Pasta de XML não encontrada: {args.xml_dir}")
@@ -393,22 +534,54 @@ def main() -> None:
     converted_objects = 0
     total_objects = 0
     unknown: Dict[str, int] = {}
+    files_with_zero_output: List[Tuple[Path, List[str]]] = []
 
     for xml_path in xml_files:
-        kept, total, unknown_labels = _convert_xml(xml_path, args.xml_dir, mapping, args.labels_dir)
+        try:
+            kept, total, unknown_labels, skip_reasons = _convert_xml(
+                xml_path=xml_path,
+                xml_root=args.xml_dir,
+                mapping=mapping,
+                labels_root=args.labels_dir,
+                default_class=args.default_class,
+            )
+        except (ET.ParseError, ConversionError, ValueError) as exc:
+            print(f"[ERRO] {xml_path}: {exc}")
+            files_with_zero_output.append((xml_path, [str(exc)]))
+            continue
+
         converted_objects += kept
         total_objects += total
         for label in unknown_labels:
             unknown[label] = unknown.get(label, 0) + 1
 
+        if total > 0 and kept == 0:
+            files_with_zero_output.append((xml_path, skip_reasons))
+
     print(f"XMLs processados: {len(xml_files)}")
     print(f"Objetos convertidos: {converted_objects}/{total_objects}")
+    print(f"Arquivos com objetos mas saída vazia: {len(files_with_zero_output)}")
     print(f"Saída YOLO: {args.labels_dir}")
 
     if unknown:
         print("\nRótulos sem mapeamento:")
         for label, count in sorted(unknown.items(), key=lambda x: (-x[1], x[0])):
             print(f"- {label}: {count}")
+
+    if files_with_zero_output:
+        print("\nDiagnóstico de XMLs com saída vazia:")
+        for xml_path, reasons in files_with_zero_output:
+            print(f"- {xml_path}:")
+            if reasons:
+                for reason in reasons[:20]:
+                    print(f"  * {reason}")
+                if len(reasons) > 20:
+                    print(f"  * ... e mais {len(reasons) - 20} razão(ões)")
+            else:
+                print("  * sem motivo detalhado")
+
+    if args.fail_on_empty and files_with_zero_output:
+        sys.exit(2)
 
 
 if __name__ == "__main__":
