@@ -59,6 +59,13 @@ Se você tiver anotações em XML (ex.: Pascal VOC/LabelImg), use:
 python src/detector/xml_to_yolo.py --xml-dir data/xml --labels-dir data/labels/train
 ```
 
+Para descobrir primeiro todos os nomes de componentes existentes no lote de XML e ver
+o que ainda não está mapeado para as classes genéricas:
+
+```bash
+python src/detector/xml_to_yolo.py --xml-dir data/xml --scan-only
+```
+
 Você pode sobrescrever o mapeamento de nomes de serviços para classes genéricas com `--mapping-json`.
 O JSON deve ser um dicionário `nome_servico -> classe_generica` (classe em: `user`, `edge_security`, `gateway`, `compute`, `data_store`, `ops`).
 

@@ -190,6 +190,68 @@ def _convert_xml(xml_path: Path, xml_root: Path, mapping: Dict[str, str], labels
     return len(yolo_lines), len(root.findall("object")), unknown_labels
 
 
+def _scan_labels(xml_files: List[Path], mapping: Dict[str, str]) -> Tuple[Dict[str, int], Dict[str, int], Dict[str, int], int]:
+    """Retorna frequência de rótulos em XML e sua situação no mapeamento.
+
+    Returns:
+        - all_labels: frequência por nome bruto do XML
+        - mapped_labels: frequência por classe genérica mapeada
+        - unmapped_labels: frequência por nome bruto sem mapeamento
+        - total_objects: total de objetos analisados
+    """
+    all_labels: Dict[str, int] = {}
+    mapped_labels: Dict[str, int] = {}
+    unmapped_labels: Dict[str, int] = {}
+    total_objects = 0
+
+    for xml_path in xml_files:
+        root = ET.parse(xml_path).getroot()
+        for obj in root.findall("object"):
+            raw_name = _first_text(obj, "name")
+            if not raw_name:
+                continue
+
+            total_objects += 1
+            all_labels[raw_name] = all_labels.get(raw_name, 0) + 1
+
+            normalized = _normalize_label(raw_name)
+            mapped = mapping.get(normalized)
+            if mapped is None:
+                unmapped_labels[raw_name] = unmapped_labels.get(raw_name, 0) + 1
+            else:
+                mapped_labels[mapped] = mapped_labels.get(mapped, 0) + 1
+
+    return all_labels, mapped_labels, unmapped_labels, total_objects
+
+
+def _print_scan_report(
+    all_labels: Dict[str, int],
+    mapped_labels: Dict[str, int],
+    unmapped_labels: Dict[str, int],
+    total_objects: int,
+    xml_count: int,
+) -> None:
+    print(f"XMLs analisados: {xml_count}")
+    print(f"Objetos anotados: {total_objects}")
+    print(f"Rótulos distintos encontrados: {len(all_labels)}")
+
+    if mapped_labels:
+        print("\nCobertura por classe genérica (após mapeamento):")
+        for label, count in sorted(mapped_labels.items(), key=lambda x: (-x[1], x[0])):
+            print(f"- {label}: {count}")
+
+    print("\nRótulos brutos encontrados no XML:")
+    for label, count in sorted(all_labels.items(), key=lambda x: (-x[1], x[0])):
+        print(f"- {label}: {count}")
+
+    if unmapped_labels:
+        print("\nRótulos SEM mapeamento (precisam entrar no mapping):")
+        for label, count in sorted(unmapped_labels.items(), key=lambda x: (-x[1], x[0])):
+            print(f"- {label}: {count}")
+    else:
+        print("\nTodos os rótulos possuem mapeamento. ✅")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Converte anotações XML (Pascal VOC/LabelImg) para YOLO TXT")
     parser.add_argument("--xml-dir", type=Path, default=project_root / "data" / "xml", help="Pasta com arquivos XML")
@@ -200,6 +262,11 @@ def main() -> None:
         default=None,
         help="JSON opcional para sobrescrever/expandir mapeamento de nome_de_servico -> classe_generica",
     )
+    parser.add_argument(
+        "--scan-only",
+        action="store_true",
+        help="Somente analisa rótulos existentes nos XMLs e cobertura do mapeamento, sem gerar TXT",
+    )
     args = parser.parse_args()
 
     if not args.xml_dir.exists():
@@ -209,6 +276,11 @@ def main() -> None:
     xml_files = _find_xmls(args.xml_dir)
     if not xml_files:
         print(f"Nenhum XML encontrado em {args.xml_dir}")
+        return
+
+    if args.scan_only:
+        all_labels, mapped_labels, unmapped_labels, total_objects = _scan_labels(xml_files, mapping)
+        _print_scan_report(all_labels, mapped_labels, unmapped_labels, total_objects, len(xml_files))
         return
 
     converted_objects = 0
