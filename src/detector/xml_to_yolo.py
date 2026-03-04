@@ -73,8 +73,117 @@ DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
 }
 
 
+PROVIDER_TOKENS = {"aws", "amazon", "azure", "gcp", "google", "cloud", "microsoft"}
+
+
+KEYWORD_TO_GENERIC: Dict[str, str] = {
+    # gateway
+    "api_gateway": "gateway",
+    "gateway": "gateway",
+    "ingress": "gateway",
+    "load_balancer": "gateway",
+    "application_gateway": "gateway",
+    "traffic_manager": "gateway",
+    # edge security
+    "waf": "edge_security",
+    "firewall": "edge_security",
+    "security_group": "edge_security",
+    "nsg": "edge_security",
+    "shield": "edge_security",
+    "ddos": "edge_security",
+    # data_store
+    "sql": "data_store",
+    "database": "data_store",
+    "datastore": "data_store",
+    "storage": "data_store",
+    "bucket": "data_store",
+    "queue": "data_store",
+    "topic": "data_store",
+    "kafka": "data_store",
+    "redis": "data_store",
+    "cache": "data_store",
+    # compute
+    "compute": "compute",
+    "server": "compute",
+    "instance": "compute",
+    "function": "compute",
+    "lambda": "compute",
+    "kubernetes": "compute",
+    "container": "compute",
+    "service": "compute",
+    "app_service": "compute",
+    "databricks": "compute",
+    "synapse": "compute",
+    "data_factory": "compute",
+    "data_factories": "compute",
+    # ops
+    "monitor": "ops",
+    "monitoring": "ops",
+    "devops": "ops",
+    "cicd": "ops",
+    "ci_cd": "ops",
+    "prometheus": "ops",
+    "grafana": "ops",
+    "cloudwatch": "ops",
+    "log": "ops",
+    "alert": "ops",
+    # user
+    "user": "user",
+    "client": "user",
+    "consumer": "user",
+    "admin": "user",
+}
+
+# Prioridade de decisão quando há múltiplas palavras candidatas no label
+GENERIC_PRIORITY = ["gateway", "edge_security", "data_store", "compute", "ops", "user"]
+
+
 def _normalize_label(raw: str) -> str:
-    return raw.strip().lower().replace(" ", "_").replace("-", "_")
+    normalized = raw.strip().lower().replace(" ", "_").replace("-", "_")
+    while "__" in normalized:
+        normalized = normalized.replace("__", "_")
+    return normalized.strip("_")
+
+
+def _tokenize(label: str) -> List[str]:
+    tokens = [tok for tok in _normalize_label(label).split("_") if tok]
+    return [tok for tok in tokens if tok not in PROVIDER_TOKENS]
+
+
+def _map_label(raw_label: str, mapping: Dict[str, str]) -> Optional[str]:
+    normalized = _normalize_label(raw_label)
+
+    # 1) Mapeamento explícito (dicionário default + JSON opcional)
+    direct = mapping.get(normalized)
+    if direct is not None:
+        return direct
+
+    # 2) Tentativas com remoção de prefixos de provider
+    tokens = _tokenize(normalized)
+    if not tokens:
+        return None
+
+    collapsed = "_".join(tokens)
+    direct = mapping.get(collapsed)
+    if direct is not None:
+        return direct
+
+    # 3) Heurística por palavra-chave/substring
+    hits: List[str] = []
+    search_space = [collapsed] + tokens
+    for candidate, generic in KEYWORD_TO_GENERIC.items():
+        for item in search_space:
+            if candidate in item or item in candidate:
+                hits.append(generic)
+                break
+
+    if not hits:
+        return None
+
+    for generic in GENERIC_PRIORITY:
+        if generic in hits:
+            return generic
+    return hits[0]
 
 
 def _load_mapping(mapping_path: Optional[Path]) -> Dict[str, str]:
@@ -159,8 +268,7 @@ def _convert_xml(xml_path: Path, xml_root: Path, mapping: Dict[str, str], labels
         if not raw_name or bndbox is None:
             continue
 
-        normalized_label = _normalize_label(raw_name)
-        mapped_label = mapping.get(normalized_label)
+        mapped_label = _map_label(raw_name, mapping)
         if mapped_label is None:
             unknown_labels.append(raw_name)
             continue
@@ -214,8 +322,7 @@ def _scan_labels(xml_files: List[Path], mapping: Dict[str, str]) -> Tuple[Dict[s
             total_objects += 1
             all_labels[raw_name] = all_labels.get(raw_name, 0) + 1
 
-            normalized = _normalize_label(raw_name)
-            mapped = mapping.get(normalized)
+            mapped = _map_label(raw_name, mapping)
             if mapped is None:
                 unmapped_labels[raw_name] = unmapped_labels.get(raw_name, 0) + 1
             else:

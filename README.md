@@ -66,6 +66,8 @@ o que ainda não está mapeado para as classes genéricas:
 python src/detector/xml_to_yolo.py --xml-dir data/xml --scan-only
 ```
 
+O script já tenta mapear nomes compostos de cloud providers (ex.: `aws_amazon_api_gateway`, `azure_sql_server`, `gcp_cloud_storage`) por heurística de tokens, evitando gerar arquivos em branco quando o nome não bate 100% com o dicionário.
+
 Você pode sobrescrever o mapeamento de nomes de serviços para classes genéricas com `--mapping-json`.
 O JSON deve ser um dicionário `nome_servico -> classe_generica` (classe em: `user`, `edge_security`, `gateway`, `compute`, `data_store`, `ops`).
 
