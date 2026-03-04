@@ -5,7 +5,7 @@ import argparse
 import json
 import sys
 import xml.etree.ElementTree as ET
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 project_root = Path(__file__).resolve().parents[2]
 if str(project_root) not in sys.path:
@@ -134,8 +134,12 @@ KEYWORD_TO_GENERIC: Dict[str, str] = {
     "admin": "user",
 }
 
-# Prioridade de decisão quando há múltiplas palavras candidatas no label
+# Prioridade determinística quando há múltiplas palavras candidatas no label
 GENERIC_PRIORITY = ["gateway", "edge_security", "data_store", "compute", "ops", "user"]
+
+
+class ConversionError(RuntimeError):
+    """Erro de conversão de um XML individual."""
 
 
 def _normalize_label(raw: str) -> str:
@@ -168,7 +172,7 @@ def _map_label(raw_label: str, mapping: Dict[str, str]) -> Optional[str]:
     if direct is not None:
         return direct
 
-    # 3) Heurística por palavra-chave/substring
+    # 3) Heurística por palavra-chave/substring com prioridade determinística
     hits: List[str] = []
     search_space = [collapsed] + tokens
     for candidate, generic in KEYWORD_TO_GENERIC.items():
@@ -209,30 +213,46 @@ def _load_mapping(mapping_path: Optional[Path]) -> Dict[str, str]:
 
 
 def _find_xmls(xml_root: Path) -> List[Path]:
-    return sorted(xml_root.rglob("*.xml"))
+    return sorted([path for path in xml_root.rglob("*") if path.is_file() and path.suffix.lower() == ".xml"])
 
 
-def _first_text(node: ET.Element, tag: str) -> Optional[str]:
-    child = node.find(tag)
-    if child is None or child.text is None:
-        return None
-    return child.text.strip()
+def _local_name(tag: str) -> str:
+    # Remove namespace no formato {ns}Tag e normaliza case
+    if "}" in tag:
+        tag = tag.split("}", 1)[1]
+    return tag.lower()
+
+
+def _iter_elements_by_tag(root: ET.Element, tag: str) -> Iterable[ET.Element]:
+    wanted = tag.lower()
+    for node in root.iter():
+        if _local_name(node.tag) == wanted:
+            yield node
+
+
+def _first_text_anywhere(node: ET.Element, tag: str) -> Optional[str]:
+    for child in node.iter():
+        if _local_name(child.tag) == tag.lower() and child.text:
+            text = child.text.strip()
+            if text:
+                return text
+    return None
 
 
 def _parse_size(root: ET.Element) -> Tuple[int, int]:
-    size = root.find("size")
-    if size is None:
-        raise ValueError("XML sem nó <size>")
+    size_node = next(_iter_elements_by_tag(root, "size"), None)
+    if size_node is None:
+        raise ConversionError("XML sem nó <size>")
 
-    width_text = _first_text(size, "width")
-    height_text = _first_text(size, "height")
+    width_text = _first_text_anywhere(size_node, "width")
+    height_text = _first_text_anywhere(size_node, "height")
     if not width_text or not height_text:
-        raise ValueError("XML sem width/height em <size>")
+        raise ConversionError("XML sem width/height em <size>")
 
     width = int(float(width_text))
     height = int(float(height_text))
     if width <= 0 or height <= 0:
-        raise ValueError(f"Dimensão inválida: width={width}, height={height}")
+        raise ConversionError(f"Dimensão inválida: width={width}, height={height}")
     return width, height
 
 
@@ -254,35 +274,62 @@ def _safe_bbox(width: int, height: int, xmin: float, ymin: float, xmax: float, y
     return xmin, ymin, xmax, ymax
 
 
-def _convert_xml(xml_path: Path, xml_root: Path, mapping: Dict[str, str], labels_root: Path) -> Tuple[int, int, List[str]]:
+def _extract_bbox(obj: ET.Element) -> Optional[Tuple[float, float, float, float]]:
+    bndbox = next(_iter_elements_by_tag(obj, "bndbox"), None)
+    if bndbox is None:
+        return None
+
+    try:
+        xmin = float(_first_text_anywhere(bndbox, "xmin") or "")
+        ymin = float(_first_text_anywhere(bndbox, "ymin") or "")
+        xmax = float(_first_text_anywhere(bndbox, "xmax") or "")
+        ymax = float(_first_text_anywhere(bndbox, "ymax") or "")
+    except ValueError:
+        return None
+
+    return xmin, ymin, xmax, ymax
+
+
+def _convert_xml(
+    xml_path: Path,
+    xml_root: Path,
+    mapping: Dict[str, str],
+    labels_root: Path,
+    default_class: Optional[str],
+) -> Tuple[int, int, List[str], List[str]]:
     tree = ET.parse(xml_path)
     root = tree.getroot()
     width, height = _parse_size(root)
 
     yolo_lines: List[str] = []
     unknown_labels: List[str] = []
+    skip_reasons: List[str] = []
 
-    for obj in root.findall("object"):
-        raw_name = _first_text(obj, "name")
-        bndbox = obj.find("bndbox")
-        if not raw_name or bndbox is None:
+    objects = list(_iter_elements_by_tag(root, "object"))
+    total_objects = len(objects)
+
+    for idx, obj in enumerate(objects, start=1):
+        raw_name = _first_text_anywhere(obj, "name")
+        if not raw_name:
+            skip_reasons.append(f"obj#{idx}: sem <name>")
             continue
 
         mapped_label = _map_label(raw_name, mapping)
+        if mapped_label is None and default_class is not None:
+            mapped_label = default_class
         if mapped_label is None:
             unknown_labels.append(raw_name)
+            skip_reasons.append(f"obj#{idx} '{raw_name}': sem mapeamento")
             continue
 
-        try:
-            xmin = float(_first_text(bndbox, "xmin") or "")
-            ymin = float(_first_text(bndbox, "ymin") or "")
-            xmax = float(_first_text(bndbox, "xmax") or "")
-            ymax = float(_first_text(bndbox, "ymax") or "")
-        except ValueError:
+        bbox_raw = _extract_bbox(obj)
+        if bbox_raw is None:
+            skip_reasons.append(f"obj#{idx} '{raw_name}': bndbox ausente/inválido")
             continue
 
-        bbox = _safe_bbox(width, height, xmin, ymin, xmax, ymax)
+        bbox = _safe_bbox(width, height, *bbox_raw)
         if bbox is None:
+            skip_reasons.append(f"obj#{idx} '{raw_name}': bndbox degenerado")
             continue
 
         class_id = CLASS_TO_ID[mapped_label]
@@ -295,18 +342,10 @@ def _convert_xml(xml_path: Path, xml_root: Path, mapping: Dict[str, str], labels
     out_file = out_dir / out_name
     out_file.write_text("\n".join(yolo_lines) + ("\n" if yolo_lines else ""), encoding="utf-8")
 
-    return len(yolo_lines), len(root.findall("object")), unknown_labels
+    return len(yolo_lines), total_objects, unknown_labels, skip_reasons
 
 
 def _scan_labels(xml_files: List[Path], mapping: Dict[str, str]) -> Tuple[Dict[str, int], Dict[str, int], Dict[str, int], int]:
-    """Retorna frequência de rótulos em XML e sua situação no mapeamento.
-
-    Returns:
-        - all_labels: frequência por nome bruto do XML
-        - mapped_labels: frequência por classe genérica mapeada
-        - unmapped_labels: frequência por nome bruto sem mapeamento
-        - total_objects: total de objetos analisados
-    """
     all_labels: Dict[str, int] = {}
     mapped_labels: Dict[str, int] = {}
     unmapped_labels: Dict[str, int] = {}
@@ -314,8 +353,8 @@ def _scan_labels(xml_files: List[Path], mapping: Dict[str, str]) -> Tuple[Dict[s
 
     for xml_path in xml_files:
         root = ET.parse(xml_path).getroot()
-        for obj in root.findall("object"):
-            raw_name = _first_text(obj, "name")
+        for obj in _iter_elements_by_tag(root, "object"):
+            raw_name = _first_text_anywhere(obj, "name")
             if not raw_name:
                 continue
 
@@ -374,7 +413,24 @@ def main() -> None:
         action="store_true",
         help="Somente analisa rótulos existentes nos XMLs e cobertura do mapeamento, sem gerar TXT",
     )
+    parser.add_argument(
+        "--default-class",
+        type=str,
+        default=None,
+        help="Classe fallback para rótulos sem mapeamento (user, edge_security, gateway, compute, data_store, ops)",
+    )
+    parser.add_argument(
+        "--fail-on-empty",
+        action="store_true",
+        help="Falha com exit code 2 se algum XML com objetos gerar 0 linhas YOLO.",
+    )
     args = parser.parse_args()
+
+    if args.default_class is not None:
+        args.default_class = _normalize_label(args.default_class)
+        if args.default_class not in CLASS_TO_ID:
+            allowed = ", ".join(CLASSES)
+            raise ValueError(f"Classe default inválida '{args.default_class}'. Classes permitidas: {allowed}")
 
     if not args.xml_dir.exists():
         raise FileNotFoundError(f"Pasta de XML não encontrada: {args.xml_dir}")
@@ -393,22 +449,54 @@ def main() -> None:
     converted_objects = 0
     total_objects = 0
     unknown: Dict[str, int] = {}
+    files_with_zero_output: List[Tuple[Path, List[str]]] = []
 
     for xml_path in xml_files:
-        kept, total, unknown_labels = _convert_xml(xml_path, args.xml_dir, mapping, args.labels_dir)
+        try:
+            kept, total, unknown_labels, skip_reasons = _convert_xml(
+                xml_path=xml_path,
+                xml_root=args.xml_dir,
+                mapping=mapping,
+                labels_root=args.labels_dir,
+                default_class=args.default_class,
+            )
+        except (ET.ParseError, ConversionError, ValueError) as exc:
+            print(f"[ERRO] {xml_path}: {exc}")
+            files_with_zero_output.append((xml_path, [str(exc)]))
+            continue
+
         converted_objects += kept
         total_objects += total
         for label in unknown_labels:
             unknown[label] = unknown.get(label, 0) + 1
 
+        if total > 0 and kept == 0:
+            files_with_zero_output.append((xml_path, skip_reasons))
+
     print(f"XMLs processados: {len(xml_files)}")
     print(f"Objetos convertidos: {converted_objects}/{total_objects}")
+    print(f"Arquivos com objetos mas saída vazia: {len(files_with_zero_output)}")
     print(f"Saída YOLO: {args.labels_dir}")
 
     if unknown:
         print("\nRótulos sem mapeamento:")
         for label, count in sorted(unknown.items(), key=lambda x: (-x[1], x[0])):
             print(f"- {label}: {count}")
+
+    if files_with_zero_output:
+        print("\nDiagnóstico de XMLs com saída vazia:")
+        for xml_path, reasons in files_with_zero_output:
+            print(f"- {xml_path}:")
+            if reasons:
+                for reason in reasons[:20]:
+                    print(f"  * {reason}")
+                if len(reasons) > 20:
+                    print(f"  * ... e mais {len(reasons) - 20} razão(ões)")
+            else:
+                print("  * sem motivo detalhado")
+
+    if args.fail_on_empty and files_with_zero_output:
+        sys.exit(2)
 
 
 if __name__ == "__main__":
