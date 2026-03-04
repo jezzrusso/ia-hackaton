@@ -1,0 +1,308 @@
+from __future__ import annotations
+
+from pathlib import Path
+import argparse
+import json
+import sys
+import xml.etree.ElementTree as ET
+from typing import Dict, List, Optional, Tuple
+
+project_root = Path(__file__).resolve().parents[2]
+if str(project_root) not in sys.path:
+    sys.path.append(str(project_root))
+
+from src.detector.classes import CLASS_TO_ID, CLASSES
+
+
+DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
+    # user
+    "user": "user",
+    "client": "user",
+    "browser": "user",
+    "admin": "user",
+    "customer": "user",
+    # edge_security
+    "waf": "edge_security",
+    "firewall": "edge_security",
+    "security_group": "edge_security",
+    "nsg": "edge_security",
+    "cloudflare": "edge_security",
+    # gateway
+    "gateway": "gateway",
+    "api_gateway": "gateway",
+    "apigateway": "gateway",
+    "apim": "gateway",
+    "ingress": "gateway",
+    "load_balancer": "gateway",
+    "lb": "gateway",
+    # compute
+    "compute": "compute",
+    "server": "compute",
+    "vm": "compute",
+    "ec2": "compute",
+    "lambda": "compute",
+    "ecs": "compute",
+    "eks": "compute",
+    "aks": "compute",
+    "gke": "compute",
+    "app_service": "compute",
+    "container": "compute",
+    # data_store
+    "data_store": "data_store",
+    "database": "data_store",
+    "db": "data_store",
+    "rds": "data_store",
+    "aurora": "data_store",
+    "dynamodb": "data_store",
+    "cosmosdb": "data_store",
+    "sql": "data_store",
+    "sql_database": "data_store",
+    "redis": "data_store",
+    "s3": "data_store",
+    "storage": "data_store",
+    # ops
+    "ops": "ops",
+    "monitoring": "ops",
+    "monitor": "ops",
+    "cloudwatch": "ops",
+    "prometheus": "ops",
+    "grafana": "ops",
+    "devops": "ops",
+    "cicd": "ops",
+    "ci_cd": "ops",
+}
+
+
+def _normalize_label(raw: str) -> str:
+    return raw.strip().lower().replace(" ", "_").replace("-", "_")
+
+
+def _load_mapping(mapping_path: Optional[Path]) -> Dict[str, str]:
+    mapping = dict(DEFAULT_SERVICE_TO_GENERIC)
+    if mapping_path is None:
+        return mapping
+
+    payload = json.loads(mapping_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError("Arquivo de mapeamento deve conter um objeto JSON (dict)")
+
+    for key, value in payload.items():
+        if not isinstance(key, str) or not isinstance(value, str):
+            raise ValueError("Mapeamento inválido: chaves e valores devem ser strings")
+        normalized_key = _normalize_label(key)
+        normalized_value = _normalize_label(value)
+        if normalized_value not in CLASS_TO_ID:
+            allowed = ", ".join(CLASSES)
+            raise ValueError(f"Classe alvo inválida '{value}'. Classes permitidas: {allowed}")
+        mapping[normalized_key] = normalized_value
+
+    return mapping
+
+
+def _find_xmls(xml_root: Path) -> List[Path]:
+    return sorted(xml_root.rglob("*.xml"))
+
+
+def _first_text(node: ET.Element, tag: str) -> Optional[str]:
+    child = node.find(tag)
+    if child is None or child.text is None:
+        return None
+    return child.text.strip()
+
+
+def _parse_size(root: ET.Element) -> Tuple[int, int]:
+    size = root.find("size")
+    if size is None:
+        raise ValueError("XML sem nó <size>")
+
+    width_text = _first_text(size, "width")
+    height_text = _first_text(size, "height")
+    if not width_text or not height_text:
+        raise ValueError("XML sem width/height em <size>")
+
+    width = int(float(width_text))
+    height = int(float(height_text))
+    if width <= 0 or height <= 0:
+        raise ValueError(f"Dimensão inválida: width={width}, height={height}")
+    return width, height
+
+
+def _to_yolo_line(class_id: int, width: int, height: int, xmin: float, ymin: float, xmax: float, ymax: float) -> str:
+    x_center = ((xmin + xmax) / 2.0) / width
+    y_center = ((ymin + ymax) / 2.0) / height
+    box_w = (xmax - xmin) / width
+    box_h = (ymax - ymin) / height
+    return f"{class_id} {x_center:.6f} {y_center:.6f} {box_w:.6f} {box_h:.6f}"
+
+
+def _safe_bbox(width: int, height: int, xmin: float, ymin: float, xmax: float, ymax: float) -> Optional[Tuple[float, float, float, float]]:
+    xmin = max(0.0, min(float(width), xmin))
+    xmax = max(0.0, min(float(width), xmax))
+    ymin = max(0.0, min(float(height), ymin))
+    ymax = max(0.0, min(float(height), ymax))
+    if xmax <= xmin or ymax <= ymin:
+        return None
+    return xmin, ymin, xmax, ymax
+
+
+def _convert_xml(xml_path: Path, xml_root: Path, mapping: Dict[str, str], labels_root: Path) -> Tuple[int, int, List[str]]:
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+    width, height = _parse_size(root)
+
+    yolo_lines: List[str] = []
+    unknown_labels: List[str] = []
+
+    for obj in root.findall("object"):
+        raw_name = _first_text(obj, "name")
+        bndbox = obj.find("bndbox")
+        if not raw_name or bndbox is None:
+            continue
+
+        normalized_label = _normalize_label(raw_name)
+        mapped_label = mapping.get(normalized_label)
+        if mapped_label is None:
+            unknown_labels.append(raw_name)
+            continue
+
+        try:
+            xmin = float(_first_text(bndbox, "xmin") or "")
+            ymin = float(_first_text(bndbox, "ymin") or "")
+            xmax = float(_first_text(bndbox, "xmax") or "")
+            ymax = float(_first_text(bndbox, "ymax") or "")
+        except ValueError:
+            continue
+
+        bbox = _safe_bbox(width, height, xmin, ymin, xmax, ymax)
+        if bbox is None:
+            continue
+
+        class_id = CLASS_TO_ID[mapped_label]
+        yolo_lines.append(_to_yolo_line(class_id, width, height, *bbox))
+
+    relative_xml = xml_path.relative_to(xml_root)
+    out_name = relative_xml.with_suffix(".txt").name
+    out_dir = labels_root / relative_xml.parent
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_file = out_dir / out_name
+    out_file.write_text("\n".join(yolo_lines) + ("\n" if yolo_lines else ""), encoding="utf-8")
+
+    return len(yolo_lines), len(root.findall("object")), unknown_labels
+
+
+def _scan_labels(xml_files: List[Path], mapping: Dict[str, str]) -> Tuple[Dict[str, int], Dict[str, int], Dict[str, int], int]:
+    """Retorna frequência de rótulos em XML e sua situação no mapeamento.
+
+    Returns:
+        - all_labels: frequência por nome bruto do XML
+        - mapped_labels: frequência por classe genérica mapeada
+        - unmapped_labels: frequência por nome bruto sem mapeamento
+        - total_objects: total de objetos analisados
+    """
+    all_labels: Dict[str, int] = {}
+    mapped_labels: Dict[str, int] = {}
+    unmapped_labels: Dict[str, int] = {}
+    total_objects = 0
+
+    for xml_path in xml_files:
+        root = ET.parse(xml_path).getroot()
+        for obj in root.findall("object"):
+            raw_name = _first_text(obj, "name")
+            if not raw_name:
+                continue
+
+            total_objects += 1
+            all_labels[raw_name] = all_labels.get(raw_name, 0) + 1
+
+            normalized = _normalize_label(raw_name)
+            mapped = mapping.get(normalized)
+            if mapped is None:
+                unmapped_labels[raw_name] = unmapped_labels.get(raw_name, 0) + 1
+            else:
+                mapped_labels[mapped] = mapped_labels.get(mapped, 0) + 1
+
+    return all_labels, mapped_labels, unmapped_labels, total_objects
+
+
+def _print_scan_report(
+    all_labels: Dict[str, int],
+    mapped_labels: Dict[str, int],
+    unmapped_labels: Dict[str, int],
+    total_objects: int,
+    xml_count: int,
+) -> None:
+    print(f"XMLs analisados: {xml_count}")
+    print(f"Objetos anotados: {total_objects}")
+    print(f"Rótulos distintos encontrados: {len(all_labels)}")
+
+    if mapped_labels:
+        print("\nCobertura por classe genérica (após mapeamento):")
+        for label, count in sorted(mapped_labels.items(), key=lambda x: (-x[1], x[0])):
+            print(f"- {label}: {count}")
+
+    print("\nRótulos brutos encontrados no XML:")
+    for label, count in sorted(all_labels.items(), key=lambda x: (-x[1], x[0])):
+        print(f"- {label}: {count}")
+
+    if unmapped_labels:
+        print("\nRótulos SEM mapeamento (precisam entrar no mapping):")
+        for label, count in sorted(unmapped_labels.items(), key=lambda x: (-x[1], x[0])):
+            print(f"- {label}: {count}")
+    else:
+        print("\nTodos os rótulos possuem mapeamento. ✅")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Converte anotações XML (Pascal VOC/LabelImg) para YOLO TXT")
+    parser.add_argument("--xml-dir", type=Path, default=project_root / "data" / "xml", help="Pasta com arquivos XML")
+    parser.add_argument("--labels-dir", type=Path, default=project_root / "data" / "labels" / "train", help="Pasta de saída dos TXT YOLO")
+    parser.add_argument(
+        "--mapping-json",
+        type=Path,
+        default=None,
+        help="JSON opcional para sobrescrever/expandir mapeamento de nome_de_servico -> classe_generica",
+    )
+    parser.add_argument(
+        "--scan-only",
+        action="store_true",
+        help="Somente analisa rótulos existentes nos XMLs e cobertura do mapeamento, sem gerar TXT",
+    )
+    args = parser.parse_args()
+
+    if not args.xml_dir.exists():
+        raise FileNotFoundError(f"Pasta de XML não encontrada: {args.xml_dir}")
+
+    mapping = _load_mapping(args.mapping_json)
+    xml_files = _find_xmls(args.xml_dir)
+    if not xml_files:
+        print(f"Nenhum XML encontrado em {args.xml_dir}")
+        return
+
+    if args.scan_only:
+        all_labels, mapped_labels, unmapped_labels, total_objects = _scan_labels(xml_files, mapping)
+        _print_scan_report(all_labels, mapped_labels, unmapped_labels, total_objects, len(xml_files))
+        return
+
+    converted_objects = 0
+    total_objects = 0
+    unknown: Dict[str, int] = {}
+
+    for xml_path in xml_files:
+        kept, total, unknown_labels = _convert_xml(xml_path, args.xml_dir, mapping, args.labels_dir)
+        converted_objects += kept
+        total_objects += total
+        for label in unknown_labels:
+            unknown[label] = unknown.get(label, 0) + 1
+
+    print(f"XMLs processados: {len(xml_files)}")
+    print(f"Objetos convertidos: {converted_objects}/{total_objects}")
+    print(f"Saída YOLO: {args.labels_dir}")
+
+    if unknown:
+        print("\nRótulos sem mapeamento:")
+        for label, count in sorted(unknown.items(), key=lambda x: (-x[1], x[0])):
+            print(f"- {label}: {count}")
+
+
+if __name__ == "__main__":
+    main()

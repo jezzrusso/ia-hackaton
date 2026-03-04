@@ -50,6 +50,25 @@ python src/detector/write_data_yaml.py
 > `images not found` quando o Ultralytics tenta resolver caminhos relativos no
 > diretório interno de datasets.
 
+
+### Converter XML para YOLO (opcional)
+
+Se você tiver anotações em XML (ex.: Pascal VOC/LabelImg), use:
+
+```bash
+python src/detector/xml_to_yolo.py --xml-dir data/xml --labels-dir data/labels/train
+```
+
+Para descobrir primeiro todos os nomes de componentes existentes no lote de XML e ver
+o que ainda não está mapeado para as classes genéricas:
+
+```bash
+python src/detector/xml_to_yolo.py --xml-dir data/xml --scan-only
+```
+
+Você pode sobrescrever o mapeamento de nomes de serviços para classes genéricas com `--mapping-json`.
+O JSON deve ser um dicionário `nome_servico -> classe_generica` (classe em: `user`, `edge_security`, `gateway`, `compute`, `data_store`, `ops`).
+
 ### 2) Treinar detector (opcional)
 
 ```bash
