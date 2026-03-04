@@ -92,10 +92,13 @@ O script já tenta mapear nomes compostos de cloud providers (ex.: `aws_amazon_a
 
 Estratégia de mapeamento aplicada (determinística):
 1. mapeamento explícito por dicionário (`DEFAULT_SERVICE_TO_GENERIC` + `--mapping-json`);
-2. normalização de rótulos (lowercase, troca de espaço/hífen por `_`);
+2. normalização de rótulos (lowercase + limpeza de símbolos como `/`, `(`, `)`, `-`, espaço para `_`);
 3. remoção de tokens de provider (`aws`, `azure`, `gcp`, `amazon`, `google`, `microsoft`, `cloud`);
 4. heurística por palavras-chave com prioridade fixa (`gateway` > `edge_security` > `data_store` > `compute` > `ops` > `user`);
 5. relatório final de rótulos não mapeados.
+
+
+Dica para lotes grandes: rode primeiro `--scan-only`, exporte os não mapeados e inclua exceções de negócio via `--mapping-json` para manter rastreabilidade do de/para.
 
 Você pode sobrescrever o mapeamento de nomes de serviços para classes genéricas com `--mapping-json`.
 O JSON deve ser um dicionário `nome_servico -> classe_generica` (classe em: `user`, `edge_security`, `gateway`, `compute`, `data_store`, `ops`).

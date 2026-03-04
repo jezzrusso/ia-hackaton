@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 import argparse
 import json
+import re
 import sys
 import xml.etree.ElementTree as ET
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -21,12 +22,22 @@ DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
     "browser": "user",
     "admin": "user",
     "customer": "user",
+    "developer_portal": "user",
+    "sei_sip": "user",
     # edge_security
     "waf": "edge_security",
     "firewall": "edge_security",
     "security_group": "edge_security",
     "nsg": "edge_security",
     "cloudflare": "edge_security",
+    "identity_access_management": "edge_security",
+    "identity_and_access_management": "edge_security",
+    "identity_access_management_role": "edge_security",
+    "iam": "edge_security",
+    "key_vault": "edge_security",
+    "key_vaults": "edge_security",
+    "entra": "edge_security",
+    "microsoft_entra": "edge_security",
     # gateway
     "gateway": "gateway",
     "api_gateway": "gateway",
@@ -35,10 +46,21 @@ DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
     "ingress": "gateway",
     "load_balancer": "gateway",
     "lb": "gateway",
+    "cloudfront": "gateway",
+    "route_53": "gateway",
+    "vpc": "gateway",
+    "virtual_private_cloud": "gateway",
+    "virtual_network": "gateway",
+    "virtual_networks": "gateway",
+    "subnet": "gateway",
+    "public_subnet": "gateway",
+    "private_subnet": "gateway",
+    "region": "gateway",
     # compute
     "compute": "compute",
     "server": "compute",
     "vm": "compute",
+    "virtual_machine": "compute",
     "ec2": "compute",
     "lambda": "compute",
     "ecs": "compute",
@@ -47,6 +69,10 @@ DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
     "gke": "compute",
     "app_service": "compute",
     "container": "compute",
+    "cloud_run": "compute",
+    "openai": "compute",
+    "machine_learning": "compute",
+    "machine_learning_studio_workspaces": "compute",
     # data_store
     "data_store": "data_store",
     "database": "data_store",
@@ -54,12 +80,20 @@ DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
     "rds": "data_store",
     "aurora": "data_store",
     "dynamodb": "data_store",
+    "dynamodb_table": "data_store",
     "cosmosdb": "data_store",
+    "cosmos_db": "data_store",
     "sql": "data_store",
     "sql_database": "data_store",
     "redis": "data_store",
     "s3": "data_store",
     "storage": "data_store",
+    "redshift": "data_store",
+    "bigquery": "data_store",
+    "event_hubs": "data_store",
+    "pubsub": "data_store",
+    "solr": "data_store",
+    "elastic_file_system": "data_store",
     # ops
     "ops": "ops",
     "monitoring": "ops",
@@ -70,6 +104,15 @@ DEFAULT_SERVICE_TO_GENERIC: Dict[str, str] = {
     "devops": "ops",
     "cicd": "ops",
     "ci_cd": "ops",
+    "cloudformation": "ops",
+    "cloudformation_template": "ops",
+    "resource_groups": "ops",
+    "resource_group": "ops",
+    "backup": "ops",
+    "cloud_trail": "ops",
+    "auto_scaling": "ops",
+    "autoscaling": "ops",
+    "aws_cloud": "ops",
 }
 
 
@@ -77,13 +120,22 @@ PROVIDER_TOKENS = {"aws", "amazon", "azure", "gcp", "google", "cloud", "microsof
 
 
 KEYWORD_TO_GENERIC: Dict[str, str] = {
-    # gateway
+    # gateway/network
     "api_gateway": "gateway",
     "gateway": "gateway",
     "ingress": "gateway",
     "load_balancer": "gateway",
     "application_gateway": "gateway",
     "traffic_manager": "gateway",
+    "vpc": "gateway",
+    "virtual_private_cloud": "gateway",
+    "virtual_network": "gateway",
+    "subnet": "gateway",
+    "route_53": "gateway",
+    "route53": "gateway",
+    "cloudfront": "gateway",
+    "dns": "gateway",
+    "cdn": "gateway",
     # edge security
     "waf": "edge_security",
     "firewall": "edge_security",
@@ -91,6 +143,12 @@ KEYWORD_TO_GENERIC: Dict[str, str] = {
     "nsg": "edge_security",
     "shield": "edge_security",
     "ddos": "edge_security",
+    "identity": "edge_security",
+    "iam": "edge_security",
+    "access_management": "edge_security",
+    "vault": "edge_security",
+    "secret": "edge_security",
+    "entra": "edge_security",
     # data_store
     "sql": "data_store",
     "database": "data_store",
@@ -102,6 +160,15 @@ KEYWORD_TO_GENERIC: Dict[str, str] = {
     "kafka": "data_store",
     "redis": "data_store",
     "cache": "data_store",
+    "dynamodb": "data_store",
+    "cosmos": "data_store",
+    "bigquery": "data_store",
+    "redshift": "data_store",
+    "event_hub": "data_store",
+    "pubsub": "data_store",
+    "elasticsearch": "data_store",
+    "solr": "data_store",
+    "file_system": "data_store",
     # compute
     "compute": "compute",
     "server": "compute",
@@ -116,6 +183,10 @@ KEYWORD_TO_GENERIC: Dict[str, str] = {
     "synapse": "compute",
     "data_factory": "compute",
     "data_factories": "compute",
+    "machine_learning": "compute",
+    "cloud_run": "compute",
+    "openai": "compute",
+    "vm": "compute",
     # ops
     "monitor": "ops",
     "monitoring": "ops",
@@ -125,13 +196,21 @@ KEYWORD_TO_GENERIC: Dict[str, str] = {
     "prometheus": "ops",
     "grafana": "ops",
     "cloudwatch": "ops",
+    "cloudformation": "ops",
+    "resource_group": "ops",
+    "backup": "ops",
+    "auto_scaling": "ops",
+    "autoscaling": "ops",
     "log": "ops",
     "alert": "ops",
+    "trail": "ops",
     # user
     "user": "user",
     "client": "user",
     "consumer": "user",
     "admin": "user",
+    "developer": "user",
+    "portal": "user",
 }
 
 # Prioridade determinística quando há múltiplas palavras candidatas no label
@@ -143,9 +222,9 @@ class ConversionError(RuntimeError):
 
 
 def _normalize_label(raw: str) -> str:
-    normalized = raw.strip().lower().replace(" ", "_").replace("-", "_")
-    while "__" in normalized:
-        normalized = normalized.replace("__", "_")
+    normalized = raw.strip().lower()
+    normalized = re.sub(r"[^a-z0-9]+", "_", normalized)
+    normalized = re.sub(r"_+", "_", normalized)
     return normalized.strip("_")
 
 
@@ -162,7 +241,7 @@ def _map_label(raw_label: str, mapping: Dict[str, str]) -> Optional[str]:
     if direct is not None:
         return direct
 
-    # 2) Tentativas com remoção de prefixos de provider
+    # 2) Tentativas com remoção de tokens de provider
     tokens = _tokenize(normalized)
     if not tokens:
         return None
@@ -172,9 +251,16 @@ def _map_label(raw_label: str, mapping: Dict[str, str]) -> Optional[str]:
     if direct is not None:
         return direct
 
+    # 2.1) Singularização leve para reduzir variações no plural
+    singular_tokens = [tok[:-1] if tok.endswith("s") and len(tok) > 3 else tok for tok in tokens]
+    singular_collapsed = "_".join(singular_tokens)
+    direct = mapping.get(singular_collapsed)
+    if direct is not None:
+        return direct
+
     # 3) Heurística por palavra-chave/substring com prioridade determinística
     hits: List[str] = []
-    search_space = [collapsed] + tokens
+    search_space = [collapsed, singular_collapsed] + tokens + singular_tokens
     for candidate, generic in KEYWORD_TO_GENERIC.items():
         for item in search_space:
             if candidate in item or item in candidate:
@@ -217,7 +303,6 @@ def _find_xmls(xml_root: Path) -> List[Path]:
 
 
 def _local_name(tag: str) -> str:
-    # Remove namespace no formato {ns}Tag e normaliza case
     if "}" in tag:
         tag = tag.split("}", 1)[1]
     return tag.lower()
