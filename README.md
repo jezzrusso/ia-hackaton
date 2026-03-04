@@ -59,6 +59,16 @@ Se você tiver anotações em XML (ex.: Pascal VOC/LabelImg), use:
 python src/detector/xml_to_yolo.py --xml-dir data/xml --labels-dir data/labels/train
 ```
 
+O conversor foi endurecido para evitar TXT vazio silencioso: ele sempre reporta
+quantos XMLs tiveram objetos mas terminaram sem linhas YOLO, e imprime diagnóstico
+por arquivo (ex.: label sem mapeamento, bndbox inválida, XML sem `<size>`).
+
+Suporte robusto incluído:
+- tags com namespace (`{ns}object`),
+- variação de caixa (`Object`, `NAME`, `BndBox`),
+- nós aninhados fora do VOC estrito,
+- arquivos `.xml` e `.XML`.
+
 Para descobrir primeiro todos os nomes de componentes existentes no lote de XML e ver
 o que ainda não está mapeado para as classes genéricas:
 
@@ -66,7 +76,29 @@ o que ainda não está mapeado para as classes genéricas:
 python src/detector/xml_to_yolo.py --xml-dir data/xml --scan-only
 ```
 
+Para usar uma classe fallback quando o rótulo não for mapeado:
+
+```bash
+python src/detector/xml_to_yolo.py --xml-dir data/xml --labels-dir data/labels/train --default-class compute
+```
+
+Para falhar o pipeline quando existir XML com objetos e saída vazia (exit code `2`):
+
+```bash
+python src/detector/xml_to_yolo.py --xml-dir data/xml --labels-dir data/labels/train --fail-on-empty
+```
+
 O script já tenta mapear nomes compostos de cloud providers (ex.: `aws_amazon_api_gateway`, `azure_sql_server`, `gcp_cloud_storage`) por heurística de tokens, evitando gerar arquivos em branco quando o nome não bate 100% com o dicionário.
+
+Estratégia de mapeamento aplicada (determinística):
+1. mapeamento explícito por dicionário (`DEFAULT_SERVICE_TO_GENERIC` + `--mapping-json`);
+2. normalização de rótulos (lowercase + limpeza de símbolos como `/`, `(`, `)`, `-`, espaço para `_`);
+3. remoção de tokens de provider (`aws`, `azure`, `gcp`, `amazon`, `google`, `microsoft`, `cloud`);
+4. heurística por palavras-chave com prioridade fixa (`gateway` > `edge_security` > `data_store` > `compute` > `ops` > `user`);
+5. relatório final de rótulos não mapeados.
+
+
+Dica para lotes grandes: rode primeiro `--scan-only`, exporte os não mapeados e inclua exceções de negócio via `--mapping-json` para manter rastreabilidade do de/para.
 
 Você pode sobrescrever o mapeamento de nomes de serviços para classes genéricas com `--mapping-json`.
 O JSON deve ser um dicionário `nome_servico -> classe_generica` (classe em: `user`, `edge_security`, `gateway`, `compute`, `data_store`, `ops`).
