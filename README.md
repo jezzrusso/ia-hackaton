@@ -31,6 +31,16 @@ Diagramas -> Detector YOLO -> Componentes priorizados -> Regras STRIDE -> Relat�
 └── requirements-gpu.txt         # Dependências para GPU
 ```
 
+## Dataset utilizado
+
+Este projeto utiliza como base o dataset público:
+
+- https://www.kaggle.com/datasets/carlosrian/software-architecture-dataset
+
+Crédito ao autor do dataset, aluno da FIAP. O conjunto original está no formato **Pascal VOC (XML)**, e neste projeto os rótulos foram convertidos para o formato **YOLO (TXT)** para treino e inferência com Ultralytics.
+
+O dataset também já inclui variações de imagens geradas por **data augmentation** (por exemplo: rotação, ajustes de saturação e brilho), técnica usada para aumentar diversidade do treino e melhorar a robustez do modelo.
+
 ## Requisitos
 
 - Python 3.10+
