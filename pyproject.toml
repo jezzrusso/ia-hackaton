@@ -1,0 +1,21 @@
+[project]
+name = "ia-hackaton"
+version = "0.1.0"
+description = "MVP de modelagem automática de ameaças com detecção de componentes e regras STRIDE"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = ["E402", "E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = "-q"

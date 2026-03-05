@@ -1,9 +1,20 @@
-# Python cache
+# Python cache / bytecode
 __pycache__/
 *.py[cod]
+*.so
+
+# Virtual environments
+.venv/
+venv/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
 
 # IDE
 .idea/
+.vscode/
 
 # Dados locais (mantém estrutura se usar .gitkeep)
 data/**
@@ -13,3 +24,6 @@ data/**
 # Saídas/artefatos
 output/
 runs/
+
+# Sistema
+.DS_Store
