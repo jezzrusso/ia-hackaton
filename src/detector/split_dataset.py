@@ -4,7 +4,6 @@ Script para separar dataset balanceado entre train/val
 Garante distribuição equilibrada entre AWS, Azure e GCP
 """
 
-import os
 import shutil
 import random
 from pathlib import Path
@@ -102,7 +101,7 @@ def split_dataset_balanced(data_dir, val_ratio=0.1, seed=42):
         
         print(f"  {provider.upper()} total: {len(provider_train_files)} train, {len(provider_val_files)} val")
     
-    print(f"\nResumo final:")
+    print("\nResumo final:")
     print(f"  Train: {len(train_files)} arquivos")
     print(f"  Val: {len(val_files)} arquivos")
     print(f"  Ratio val/total: {len(val_files)/(len(train_files)+len(val_files)):.2%}")
@@ -113,7 +112,7 @@ def split_dataset_balanced(data_dir, val_ratio=0.1, seed=42):
         provider = get_provider_from_filename(img_path.name)
         val_provider_count[provider] += 1
     
-    print(f"\nDistribuição VAL por provider:")
+    print("\nDistribuição VAL por provider:")
     for provider, count in val_provider_count.items():
         print(f"  {provider.upper()}: {count} arquivos ({count/len(val_files):.1%})")
     
@@ -165,7 +164,7 @@ def main():
     # Fazer split balanceado
     train_count, val_count = split_dataset_balanced(data_dir, val_ratio=0.1)
     
-    print(f"\n=== Concluído ===")
+    print("\n=== Concluído ===")
     print(f"Train: {train_count} arquivos")
     print(f"Val: {val_count} arquivos")
     print(f"Total: {train_count + val_count} arquivos")
