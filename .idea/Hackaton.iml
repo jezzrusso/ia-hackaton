@@ -3,6 +3,14 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/output" />
+      <excludeFolder url="file://$MODULE_DIR$/runs/stride_mvp/weights" />
+      <excludeFolder url="file://$MODULE_DIR$/runs/stride_mvp2/weights" />
+      <excludeFolder url="file://$MODULE_DIR$/runs/stride_mvp_gpu13" />
+      <excludeFolder url="file://$MODULE_DIR$/runs/stride_mvp_gpu14" />
+      <excludeFolder url="file://$MODULE_DIR$/runs/stride_mvp_gpu15" />
+      <excludeFolder url="file://$MODULE_DIR$/runs/stride_mvp_gpu2/weights" />
+      <excludeFolder url="file://$MODULE_DIR$/runs/stride_mvp_gpu3/weights" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12 (Hackaton)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
