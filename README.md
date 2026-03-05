@@ -1,156 +1,114 @@
-# Modelagem de Ameaças com IA (MVP)
+# IA para Modelagem de Ameaças (MVP)
 
-Este repositório implementa um MVP para o desafio de **modelagem automática de ameaças** a partir de diagramas de arquitetura, combinando:
+Pipeline de **modelagem automática de ameaças** a partir de diagramas de arquitetura, combinando:
 
-1. **Detecção supervisionada de componentes** (YOLO);
-2. **Mapeamento STRIDE por tipo de componente**;
-3. **Mapeamento STRIDE por componente e por associação entre componentes**;
-4. **Geração de relatório automático** em JSON e Markdown.
+1. detecção supervisionada de componentes (YOLO);
+2. mapeamento STRIDE por tipo de componente;
+3. mapeamento STRIDE por interação entre componentes;
+4. geração de relatório automático em JSON e Markdown.
 
-## Estrutura real do projeto
+## Visão geral da arquitetura
+
+```text
+Diagramas -> Detector YOLO -> Componentes priorizados -> Regras STRIDE -> Relatório (JSON/MD)
+```
+
+## Estrutura do repositório
 
 ```text
 .
-├── data/
-│   ├── images/
-│   ├── labels/
-│   └── data.yaml
-├── docs/
-│   ├── desafio.md
-│   ├── planning.md
-│   ├── threat-baseline.md
-│   └── architectures/
-├── output/
-│   ├── *_components.json
-│   └── *_threat_report.(json|md)
-└── src/
-    ├── detector/
-    │   ├── classes.py
-    │   ├── train_yolo.py
-    │   ├── predict_yolo.py
-    │   └── write_data_yaml.py
-    ├── stride/
-    │   ├── rules.py
-    │   └── interaction_rules.py
-    ├── knowledge_base/
-    │   └── catalog.py
-    └── report/
-        └── generate_report.py
+├── data/                        # Dataset local (imagens, labels, yaml)
+├── docs/                        # Materiais de apoio do desafio
+├── output/                      # Saídas de inferência e relatórios
+├── src/
+│   ├── detector/                # Treino/inferência e utilitários de dataset
+│   ├── knowledge_base/          # Vulnerabilidades, contramedidas e referências
+│   ├── report/                  # Geração de relatório final
+│   └── stride/                  # Regras STRIDE por componente/interação
+├── Makefile                     # Comandos de desenvolvimento
+├── pyproject.toml               # Configuração de lint/format/test
+├── requirements.txt             # Dependências base (CPU)
+└── requirements-gpu.txt         # Dependências para GPU
 ```
 
-## Como executar
+## Requisitos
 
-### 1) Gerar `data/data.yaml`
+- Python 3.10+
+- Dependências instaladas com `pip install -r requirements.txt`
+- (Opcional) GPU compatível com CUDA para treino/inferência acelerados
+
+## Execução rápida
+
+### 1) Preparar `data/data.yaml`
 
 ```bash
 python src/detector/write_data_yaml.py
 ```
 
-> Observação (Windows): o script escreve `path` absoluto no YAML para evitar o erro
-> `images not found` quando o Ultralytics tenta resolver caminhos relativos no
-> diretório interno de datasets.
-
-
-### Converter XML para YOLO (opcional)
-
-Se você tiver anotações em XML (ex.: Pascal VOC/LabelImg), use:
+### 2) Converter XML para YOLO (opcional)
 
 ```bash
 python src/detector/xml_to_yolo.py --xml-dir data/xml --labels-dir data/labels/train
 ```
 
-O conversor foi endurecido para evitar TXT vazio silencioso: ele sempre reporta
-quantos XMLs tiveram objetos mas terminaram sem linhas YOLO, e imprime diagnóstico
-por arquivo (ex.: label sem mapeamento, bndbox inválida, XML sem `<size>`).
-
-Suporte robusto incluído:
-- tags com namespace (`{ns}object`),
-- variação de caixa (`Object`, `NAME`, `BndBox`),
-- nós aninhados fora do VOC estrito,
-- arquivos `.xml` e `.XML`.
-
-Para descobrir primeiro todos os nomes de componentes existentes no lote de XML e ver
-o que ainda não está mapeado para as classes genéricas:
+Comandos úteis:
 
 ```bash
+# Somente varredura de rótulos
 python src/detector/xml_to_yolo.py --xml-dir data/xml --scan-only
-```
 
-Para usar uma classe fallback quando o rótulo não for mapeado:
-
-```bash
+# Fallback de classe para rótulos não mapeados
 python src/detector/xml_to_yolo.py --xml-dir data/xml --labels-dir data/labels/train --default-class compute
-```
 
-Para falhar o pipeline quando existir XML com objetos e saída vazia (exit code `2`):
-
-```bash
+# Falhar execução quando houver XML com objetos e saída vazia
 python src/detector/xml_to_yolo.py --xml-dir data/xml --labels-dir data/labels/train --fail-on-empty
 ```
 
-O script já tenta mapear nomes compostos de cloud providers (ex.: `aws_amazon_api_gateway`, `azure_sql_server`, `gcp_cloud_storage`) por heurística de tokens, evitando gerar arquivos em branco quando o nome não bate 100% com o dicionário.
-
-Estratégia de mapeamento aplicada (determinística):
-1. mapeamento explícito por dicionário (`DEFAULT_SERVICE_TO_GENERIC` + `--mapping-json`);
-2. normalização de rótulos (lowercase + limpeza de símbolos como `/`, `(`, `)`, `-`, espaço para `_`);
-3. remoção de tokens de provider (`aws`, `azure`, `gcp`, `amazon`, `google`, `microsoft`, `cloud`);
-4. heurística por palavras-chave com prioridade fixa (`gateway` > `edge_security` > `data_store` > `compute` > `ops` > `user`);
-5. relatório final de rótulos não mapeados.
-
-
-Dica para lotes grandes: rode primeiro `--scan-only`, exporte os não mapeados e inclua exceções de negócio via `--mapping-json` para manter rastreabilidade do de/para.
-
-Você pode sobrescrever o mapeamento de nomes de serviços para classes genéricas com `--mapping-json`.
-O JSON deve ser um dicionário `nome_servico -> classe_generica` (classe em: `user`, `edge_security`, `gateway`, `compute`, `data_store`, `ops`).
-
-### 2) Treinar detector (opcional)
+### 3) Treinar detector (opcional)
 
 ```bash
 python src/detector/train_yolo.py --device 0
 ```
 
-O script de treino agora regenera o `data/data.yaml` e valida automaticamente se
-`train` e `val` existem antes de iniciar o treinamento.
-
-### 3) Detectar componentes nos diagramas
+### 4) Detectar componentes
 
 ```bash
 python src/detector/predict_yolo.py --device cpu --max-components 15 --min-priority-confidence 0.0
 ```
 
-Arquivos esperados:
-- `output/aws_components.json`
-- `output/azure_components.json`
-- `output/aws_annotated.png`
-- `output/azure_annotated.png`
+Saídas esperadas em `output/`:
 
-Os PNGs anotados preservam a resolução original e incluem:
-- apenas componentes priorizados por `confiança x risco`;
-- bounding box do componente;
-- rótulo visual com ID (`c1`, `c2`, ...);
-- linha de ligação quando o rótulo é deslocado para evitar sobreposição.
+- `*_components.json`
+- `*_annotated.png`
 
-A saída JSON também registra:
-- `selection`: estratégia de priorização aplicada;
-- `excluded_components`: componentes descartados para reduzir ruído.
-
-Você pode ajustar a priorização no CLI com `--max-components` e `--min-priority-confidence`.
-
-### 4) Gerar relatório STRIDE + contramedidas
+### 5) Gerar relatório STRIDE
 
 ```bash
 python src/report/generate_report.py --input-dir output --out-dir output
 ```
 
-Arquivos gerados:
-- `output/aws_components_threat_report.json`
-- `output/aws_components_threat_report.md`
-- `output/azure_components_threat_report.json`
-- `output/azure_components_threat_report.md`
+Saídas esperadas em `output/`:
 
-## Limitações do MVP
+- `*_threat_report.json`
+- `*_threat_report.md`
 
-- O mapeamento STRIDE é baseado em regras heurísticas por tipo de componente.
-- As associações entre componentes são inferidas por proximidade espacial quando o detector não informa fluxos explícitos.
-- A base de conhecimento de vulnerabilidades/contramedidas é inicial e pode ser expandida.
-- A qualidade do relatório depende da qualidade da detecção dos componentes.
+## Comandos de desenvolvimento
+
+```bash
+make install      # instala dependências base
+make check        # validações rápidas (lint + compilação)
+make run-report   # gera relatório a partir de output/
+```
+
+## Limitações atuais
+
+- O mapeamento STRIDE usa regras heurísticas.
+- Interações entre componentes podem ser inferidas por proximidade quando não há fluxos explícitos.
+- A base de conhecimento é inicial e deve evoluir conforme novos cenários.
+- A qualidade da saída depende da qualidade da detecção.
+
+## Próximos passos recomendados
+
+- ampliar dataset rotulado e matriz de classes;
+- incluir avaliação sistemática (métricas de detecção e qualidade do relatório);
+- adicionar suíte de testes automatizados para regras STRIDE e geração de relatório.
