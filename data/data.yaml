@@ -1,4 +1,4 @@
-path: C:/Users/office/Documents/estudo/IA/FIAP/projetos/git/Hackaton/data
+path: {seu-path} ## este arquivo é gerado pelo arquivo write_data_yaml.py e pega o path automaticamente
 train: images/train
 val: images/val
 names:
